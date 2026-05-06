@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أصوات تصنع الأثر | TED-AI Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   OFFICIAL PALETTE — FINAL
+════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:        #0B1F3A;
+  --blue-2:      #0F2847;
+  --blue-3:      #142F55;
+  --blue-4:      #1A3A68;
+  --white:       #FFFFFF;
+  --off-white:   #F7F9FC;
+  --gold:        #F4C430;
+  --gold-dark:   #E0B020;
+  --gold-pale:   rgba(244,196,48,.1);
+  --gold-b:      rgba(244,196,48,.25);
+  --purple:      #6C63FF;
+  --purple-pale: rgba(108,99,255,.09);
+  --purple-b:    rgba(108,99,255,.22);
+  --green:       #2ECC71;
+  --green-pale:  rgba(46,204,113,.1);
+  --text-dark:   #1A1A1A;
+  --text-mid:    #4A5568;
+  --text-muted:  #8896A8;
+  --border-d:    rgba(255,255,255,.08);
+  --border-l:    rgba(11,31,58,.1);
+  --sh-card:     0 2px 16px rgba(11,31,58,.08),0 1px 4px rgba(11,31,58,.04);
+  --sh-hover:    0 20px 56px rgba(11,31,58,.16),0 4px 16px rgba(11,31,58,.08);
+  --sh-gold:     0 8px 32px rgba(244,196,48,.3);
+  --fb:'Cairo',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --r:14px; --rs:8px;
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--blue);color:var(--white);font-family:var(--fb);font-size:16px;line-height:1.65;overflow-x:hidden;cursor:none}
+::selection{background:var(--gold);color:var(--blue)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--blue-2)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+button{font-family:var(--fb);cursor:none}
+
+/* ── CURSOR ── */
+.cur,.cur-ring{position:fixed;pointer-events:none;border-radius:50%;z-index:9999;transform:translate(-50%,-50%)}
+.cur{width:10px;height:10px;background:var(--gold);transition:width .2s,height .2s,background .2s}
+.cur-ring{width:38px;height:38px;border:1.5px solid rgba(244,196,48,.4);transition:none}
+@media(max-width:768px){.cur,.cur-ring{display:none}body{cursor:auto}button{cursor:pointer}}
+
+/* ── LOADER ── */
+#loader{
+  position:fixed;inset:0;background:var(--blue);z-index:8000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .7s,visibility .7s;
+}
+#loader.out{opacity:0;visibility:hidden;pointer-events:none}
+.ld-logo{font-size:56px;font-weight:900;letter-spacing:-.03em;opacity:0;animation:rise .9s .2s cubic-bezier(.16,1,.3,1) forwards}
+.ld-logo b{color:var(--gold)}
+.ld-sub{font-family:var(--fm);font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:rise .7s .5s both}
+.ld-bar{width:180px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;opacity:0;animation:rise .5s .6s both}
+.ld-fill{height:100%;background:var(--gold);animation:lf 1.5s .6s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes lf{0%{width:0}100%{width:100%}}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;height:62px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 48px;
+  background:rgba(11,31,58,.92);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border-d);transition:box-shadow .3s;
+}
+.nav.s{box-shadow:0 4px 32px rgba(0,0,0,.3)}
+.nbrand{display:flex;align-items:center;gap:11px;cursor:none;user-select:none}
+.nmark{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--blue);flex-shrink:0}
+.ntitle{font-size:16px;font-weight:800;color:var(--white);letter-spacing:-.02em}
+.ntitle em{font-style:normal;color:var(--gold)}
+.nsub{font-family:var(--fm);font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.nlinks{display:flex;align-items:center;gap:2px;position:absolute;left:50%;transform:translateX(-50%)}
+.nlink{padding:7px 16px;background:none;border:none;font-size:14px;font-weight:600;color:rgba(255,255,255,.45);border-radius:100px;transition:all .2s}
+.nlink:hover{color:var(--white);background:rgba(255,255,255,.07)}
+.nlink.on{color:var(--white)}
+.ncta{padding:8px 22px;background:var(--gold);border:none;color:var(--blue);font-size:14px;font-weight:800;border-radius:100px;transition:all .2s;box-shadow:var(--sh-gold)}
+.ncta:hover{background:var(--gold-dark);transform:scale(1.04)}
+.ham{display:none;background:none;border:none;color:var(--white);font-size:22px;padding:4px}
+.mnav{display:none;position:fixed;top:62px;left:0;right:0;bottom:0;background:rgba(11,31,58,.98);backdrop-filter:blur(20px);flex-direction:column;padding:24px;z-index:499;border-top:1px solid var(--border-d)}
+.mnav.open{display:flex}
+.mnav .nlink{padding:14px 0;font-size:16px;border-bottom:1px solid var(--border-d);color:rgba(255,255,255,.6)}
+
+/* ── PAGES ── */
+.pg{display:none;padding-top:62px;min-height:100vh}
+.pg.on{display:block}
+
+/* ═════════════════════════════════════
+   LANDING
+═════════════════════════════════════ */
+#pg-land{padding-top:0;position:relative;overflow:hidden}
+
+/* BG SYSTEM */
+.land-bg{position:absolute;inset:0;overflow:hidden}
+.bg-base{position:absolute;inset:0;background:linear-gradient(180deg,#040D1A 0%,var(--blue) 55%,var(--blue-2) 100%)}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(70px)}
+.orb1{width:700px;height:700px;top:-150px;right:-200px;background:radial-gradient(circle,rgba(108,99,255,.15) 0%,transparent 70%);animation:float1 9s ease-in-out infinite}
+.orb2{width:600px;height:600px;bottom:-100px;left:-150px;background:radial-gradient(circle,rgba(244,196,48,.08) 0%,transparent 70%);animation:float2 11s ease-in-out infinite}
+.orb3{width:400px;height:400px;top:40%;left:30%;background:radial-gradient(circle,rgba(46,204,113,.06) 0%,transparent 70%);animation:float1 7s ease-in-out infinite reverse}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-20px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,25px)}}
+.bg-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent)}
+
+/* HERO */
+.hero{
+  position:relative;z-index:2;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:100px 40px 80px;text-align:center;
+}
+.h-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;padding:5px 16px;margin-bottom:36px;
+  background:var(--gold-pale);border:1px solid var(--gold-b);border-radius:100px;
+  font-family:var(--fm);font-size:11px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;
+  opacity:0;animation:rise .8s .8s both;
+}
+.h-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.h-title{
+  font-size:clamp(44px,8vw,96px);font-weight:900;line-height:.95;
+  letter-spacing:-.035em;color:var(--white);margin-bottom:24px;
+  opacity:0;animation:rise .9s 1s both;
+}
+.h-title .gold{
+  color:var(--gold);display:inline-block;position:relative;
+}
+.h-title .gold::after{
+  content:'';position:absolute;bottom:-6px;left:0;right:0;height:3px;
+  background:var(--gold);border-radius:2px;
+  transform:scaleX(0);transform-origin:right;
+  animation:uline .6s 1.8s ease forwards;
+}
+@keyframes uline{to{transform:scaleX(1);transform-origin:left}}
+.h-quote{
+  font-size:clamp(16px,2.4vw,22px);font-weight:500;font-style:italic;
+  color:rgba(255,255,255,.7);max-width:680px;line-height:1.7;margin-bottom:48px;
+  position:relative;padding:0 32px;
+  opacity:0;animation:rise .9s 1.2s both;
+}
+.h-quote::before{
+  content:'"';font-size:80px;color:rgba(244,196,48,.15);
+  position:absolute;top:-16px;right:0;font-style:normal;line-height:1;
+}
+.h-btn{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:18px 52px;background:var(--gold);border:none;
+  color:var(--blue);font-size:17px;font-weight:800;
+  border-radius:100px;transition:all .3s cubic-bezier(.16,1,.3,1);
+  box-shadow:var(--sh-gold);letter-spacing:.01em;
+  opacity:0;animation:rise .9s 1.4s both;
+}
+.h-btn:hover{background:var(--gold-dark);transform:translateY(-3px) scale(1.04);box-shadow:0 14px 44px rgba(244,196,48,.45)}
+.h-btn-arr{width:30px;height:30px;border-radius:50%;background:rgba(11,31,58,.18);display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .25s}
+.h-btn:hover .h-btn-arr{transform:translateX(-5px)}
+.h-hint{font-family:var(--fm);font-size:11px;color:rgba(255,255,255,.28);letter-spacing:.1em;margin-top:18px;opacity:0;animation:rise .8s 1.6s both}
+
+/* SCROLL LINE */
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:.45;animation:rise .7s 2s both;cursor:none}
+.scroll-hint span{font-family:var(--fm);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(244,196,48,.5),transparent);animation:scroll-puls 2s ease-in-out infinite}
+@keyframes scroll-puls{0%,100%{opacity:.4;transform:scaleY(1)}50%{opacity:1;transform:scaleY(.6)}}
+
+/* STATS STRIP */
+.stats-strip{background:var(--blue-2);border-top:1px solid var(--border-d);border-bottom:1px solid var(--border-d);padding:28px 40px}
+.stats-in{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{text-align:center;padding:0 16px;border-left:1px solid var(--border-d)}
+.stat:last-child{border-left:none}
+.stat-n{
+  font-size:40px;font-weight:900;letter-spacing:-.03em;line-height:1;display:block;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--gold) 0%,#FDE68A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-l{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase}
+
+/* ═════════════════════════════════════
+   PROJECTS PAGE — Netflix Grid
+═════════════════════════════════════ */
+.proj-hero{padding:56px 48px 36px;background:linear-gradient(180deg,var(--blue-3) 0%,var(--blue) 100%);border-bottom:1px solid var(--border-d)}
+.ph-in{max-width:1160px;margin:0 auto}
+.ph-ey{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.ph-ey::after{content:'';flex:0 0 32px;height:1px;background:var(--gold)}
+.ph-h{font-size:clamp(28px,4vw,48px);font-weight:900;color:var(--white);letter-spacing:-.03em;margin-bottom:10px;line-height:1.1}
+.ph-s{font-size:16px;color:rgba(255,255,255,.45);max-width:520px;line-height:1.85}
+
+/* Filter */
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 48px;background:var(--blue-2);border-bottom:1px solid var(--border-d)}
+.fb{padding:8px 18px;background:none;border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);font-size:13px;font-weight:600;border-radius:100px;transition:all .2s;white-space:nowrap}
+.fb:hover{border-color:rgba(255,255,255,.3);color:var(--white)}
+.fb.on{background:var(--gold);border-color:var(--gold);color:var(--blue)}
+
+/* Grid */
+.grid-wrap{max-width:1160px;margin:0 auto;padding:44px 48px 80px}
+.nf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+
+/* PROJECT CARD — Netflix + color system */
+.pc{
+  background:var(--white);border-radius:var(--r);overflow:hidden;cursor:none;
+  transition:transform .4s cubic-bezier(.16,1,.3,1),box-shadow .4s;
+  box-shadow:var(--sh-card);position:relative;
+  opacity:0;animation:rise .5s both;
+}
+.pc:hover{transform:translateY(-8px) scale(1.02);box-shadow:var(--sh-hover)}
+/* Category border — color system */
+.pc[data-cat=health]{border-top:3px solid var(--purple)}
+.pc[data-cat=education]{border-top:3px solid var(--blue-4)}
+.pc[data-cat=tech]{border-top:3px solid var(--green)}
+.pc[data-cat=community]{border-top:3px solid var(--gold)}
+
+.pc-thumb{position:relative;aspect-ratio:16/9;overflow:hidden}
+.pc-bg{position:absolute;inset:0;transition:transform .6s}
+.pc:hover .pc-bg{transform:scale(1.06)}
+.pc-ov{position:absolute;inset:0;background:rgba(11,31,58,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+.pc:hover .pc-ov{opacity:1}
+.pc-play{width:56px;height:56px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;padding-right:3px;color:var(--blue);box-shadow:0 6px 24px rgba(244,196,48,.5);transform:scale(.85);transition:transform .3s}
+.pc:hover .pc-play{transform:scale(1)}
+.pc-rank{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:700;color:var(--blue);box-shadow:0 4px 12px rgba(244,196,48,.4)}
+.pc-badge{position:absolute;top:12px;left:12px;padding:3px 9px;border-radius:100px;font-size:9px;font-weight:700;font-family:var(--fm);letter-spacing:.04em}
+.b-purple{background:rgba(108,99,255,.9);color:#fff}
+.b-gold{background:rgba(244,196,48,.9);color:var(--blue)}
+.b-green{background:rgba(46,204,113,.9);color:#fff}
+
+/* Hover reveal */
+.pc-hover{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(to top,rgba(11,31,58,.95),transparent);transform:translateY(100%);transition:transform .3s}
+.pc:hover .pc-hover{transform:translateY(0)}
+.pc-hover-txt{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6}
+
+.pc-body{padding:18px 20px}
+/* Category label color */
+.pc-cat{font-family:var(--fm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:5px}
+.pc[data-cat=health] .pc-cat{color:var(--purple)}
+.pc[data-cat=education] .pc-cat{color:var(--blue-4)}
+.pc[data-cat=tech] .pc-cat{color:var(--green)}
+.pc[data-cat=community] .pc-cat{color:var(--gold-dark)}
+.pc-title{font-size:17px;font-weight:800;color:var(--text-dark);margin-bottom:4px;letter-spacing:-.01em;line-height:1.25}
+.pc-student{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+
+/* AI Insight line */
+.pc-ai{padding:10px 12px;background:var(--purple-pale);border:1px solid var(--purple-b);border-right:2px solid var(--purple);border-radius:var(--rs);margin-bottom:12px}
+.pc-ai-lbl{font-family:var(--fm);font-size:9px;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.pc-ai-txt{font-size:12px;color:var(--text-mid);line-height:1.6}
+
+.pc-footer{display:flex;align-items:center;justify-content:space-between;padding-top:11px;border-top:1px solid var(--off-white)}
+.pc-score{font-size:19px;font-weight:900;color:var(--text-dark);letter-spacing:-.02em;line-height:1}
+.pc-score-l{font-size:10px;color:var(--text-muted);margin-top:1px}
+.vbtn{
+  display:flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--gold-pale);border:1.5px solid var(--gold-b);
+  color:var(--text-dark);font-size:13px;font-weight:700;
+  border-radius:100px;transition:all .25s;
+}
+.vbtn:hover,.vbtn.on{background:var(--gold);border-color:var(--gold);transform:scale(1.05);box-shadow:0 4px 16px rgba(244,196,48,.35);color:var(--blue)}
+
+/* Stars & cat votes */
+.stars{display:flex;gap:2px;margin-top:5px}
+.star{font-size:14px;color:#E2E8F0;transition:transform .15s;line-height:1}
+.star:hover,.star.on{color:var(--gold);transform:scale(1.2)}
+.cvotes{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.cv{padding:3px 9px;border-radius:100px;font-size:10px;font-weight:600;border:1.5px solid rgba(11,31,58,.1);color:var(--text-muted);background:var(--off-white);transition:all .2s}
+.cv:hover{border-color:var(--gold-b);background:var(--gold-pale);color:var(--text-dark)}
+.cv.on{background:var(--gold);border-color:var(--gold);color:var(--blue)}
+
+/* ═════════════════════════════════════
+   LEADERBOARD
+═════════════════════════════════════ */
+.board-wrap{max-width:1000px;margin:0 auto;padding:56px 40px 80px}
+.board-tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+.btab{padding:9px 20px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:13px;font-weight:600;border-radius:100px;transition:all .2s}
+.btab:hover{border-color:rgba(255,255,255,.25);color:var(--white)}
+.btab.on{background:var(--gold);border-color:var(--gold);color:var(--blue)}
+
+/* Podium — Gold / Blue / Purple */
+.podium{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:4px;border-radius:16px;overflow:hidden;margin-bottom:4px}
+.pod{padding:32px 20px;text-align:center;position:relative;overflow:hidden}
+.pod-1{background:linear-gradient(180deg,#142244 0%,var(--blue-2) 100%)}
+.pod-2{background:linear-gradient(180deg,#1B2E5A 0%,#162040 100%);border-top:3px solid var(--gold)}
+.pod-3{background:linear-gradient(180deg,#1A1440 0%,var(--blue) 100%)}
+.pod-glow{position:absolute;width:200px;height:200px;border-radius:50%;filter:blur(60px);top:-40px;left:50%;transform:translateX(-50%);opacity:.3}
+.pod-2 .pod-glow{background:var(--gold)}
+.pod-1 .pod-glow{background:var(--purple)}
+.pod-3 .pod-glow{background:var(--green)}
+.pod-medal{font-size:40px;display:block;margin-bottom:10px}
+.pod-name{font-size:16px;font-weight:800;color:var(--white);margin-bottom:3px}
+.pod-title{font-size:11px;color:rgba(255,255,255,.45);margin-bottom:16px;line-height:1.5}
+.pod-score{font-size:50px;font-weight:900;line-height:1;display:block;margin-bottom:4px;letter-spacing:-.03em}
+.pod-2 .pod-score{color:var(--gold)}
+.pod-1 .pod-score{color:var(--purple-2,#8B85FF)}
+.pod-3 .pod-score{color:var(--green)}
+.pod-lbl{font-family:var(--fm);font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.08em;text-transform:uppercase}
+
+/* Board table */
+.board-tbl{background:rgba(255,255,255,.04);border:1px solid var(--border-d);border-radius:16px;overflow:hidden;margin-top:4px}
+.bt-head,.bt-row{display:grid;grid-template-columns:52px 1fr 72px 72px 72px 1fr;gap:8px;padding:12px 18px;align-items:center}
+.bt-head{background:rgba(255,255,255,.04);border-bottom:1px solid var(--border-d)}
+.bt-hc{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.bt-row{border-bottom:1px solid var(--border-d);cursor:none;transition:background .15s}
+.bt-row:hover{background:rgba(255,255,255,.04)}
+.bt-row:last-child{border-bottom:none}
+.bt-row.top{background:rgba(244,196,48,.04)}
+.bt-rank{font-size:20px;font-weight:900;text-align:center;color:rgba(255,255,255,.22)}
+.bt-row.top .bt-rank{color:var(--gold)}
+.bt-t{font-size:13px;font-weight:700;color:var(--white);margin-bottom:2px}
+.bt-s{font-size:11px;color:rgba(255,255,255,.38)}
+.bt-col{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);text-align:center}
+.bt-bar-bg{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.bt-bar-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 1.2s}
+
+/* ═════════════════════════════════════
+   MODAL — Experience Page
+═════════════════════════════════════ */
+.mov{display:none;position:fixed;inset:0;z-index:600;background:rgba(7,14,28,.96);backdrop-filter:blur(24px);overflow-y:auto}
+.mov.open{display:block}
+.mwrap{max-width:860px;margin:0 auto;padding:0 20px 80px}
+.mback{display:flex;align-items:center;gap:7px;margin:22px 0 18px;background:none;border:none;color:rgba(255,255,255,.4);font-size:14px;font-weight:600;transition:color .2s}
+.mback:hover{color:var(--white)}
+.mbox{background:var(--white);border-radius:18px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.55)}
+
+/* Video header */
+.mv-vid{position:relative;aspect-ratio:16/9;cursor:none;overflow:hidden}
+.mv-bg{position:absolute;inset:0;transition:transform .5s}
+.mv-vid:hover .mv-bg{transform:scale(1.03)}
+.mv-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,31,58,.78) 0%,rgba(11,31,58,.15) 100%);display:flex;align-items:center;justify-content:center;transition:background .3s}
+.mv-vid:hover .mv-ov{background:linear-gradient(to top,rgba(11,31,58,.65) 0%,rgba(11,31,58,.08) 100%)}
+.mv-play{width:80px;height:80px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:28px;padding-right:5px;color:var(--blue);box-shadow:0 8px 40px rgba(244,196,48,.5);transition:transform .25s}
+.mv-vid:hover .mv-play{transform:scale(1.1)}
+.mv-lbl{position:absolute;bottom:14px;right:14px;background:rgba(11,31,58,.8);border:1px solid var(--border-d);color:var(--gold);font-family:var(--fm);font-size:10px;padding:4px 12px;border-radius:100px}
+
+/* Story layout */
+.mc{padding:28px 32px}
+.mc-ey{font-family:var(--fm);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--purple);margin-bottom:8px}
+.mc-title{font-size:28px;font-weight:900;color:var(--text-dark);margin-bottom:5px;letter-spacing:-.02em;line-height:1.2}
+.mc-meta{font-size:13px;color:var(--text-muted);margin-bottom:22px}
+
+/* Story lines */
+.story-lines{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
+.story-line{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px;background:var(--off-white);border:1px solid var(--border-l);border-radius:var(--rs);
+}
+.sl-ico{font-size:22px;flex-shrink:0;margin-top:1px}
+.sl-lbl{font-family:var(--fm);font-size:9px;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.sl-val{font-size:14px;font-weight:600;color:var(--text-dark);line-height:1.5}
+
+/* Stats mini */
+.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.mcs{padding:14px;background:var(--off-white);border:1px solid var(--border-l);border-radius:var(--rs);text-align:center}
+.mcs-n{font-size:28px;font-weight:900;color:var(--blue);letter-spacing:-.03em;line-height:1;display:block;margin-bottom:3px}
+.mcs-l{font-size:11px;color:var(--text-muted)}
+
+/* Emotional section */
+.mc-emotion{
+  margin:20px 0;padding:22px 26px;text-align:center;
+  background:linear-gradient(135deg,rgba(108,99,255,.07),rgba(108,99,255,.02));
+  border:1px solid var(--purple-b);border-radius:var(--r);
+}
+.mc-emo-txt{font-size:16px;font-weight:600;font-style:italic;color:var(--blue);line-height:1.7}
+.mc-emo-txt em{font-style:normal;color:var(--purple);font-weight:800}
+
+/* Vote section */
+.mc-vote{padding:24px;background:var(--blue);border-radius:var(--r);text-align:center}
+.mc-vote-h{font-size:20px;font-weight:800;color:var(--white);margin-bottom:7px}
+.mc-vote-s{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:22px;line-height:1.65}
+.btn-vote{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 42px;background:var(--gold);border:none;
+  color:var(--blue);font-size:16px;font-weight:800;
+  border-radius:100px;transition:all .25s;
+  box-shadow:var(--sh-gold);margin-bottom:18px;
+}
+.btn-vote:hover{background:var(--gold-dark);transform:translateY(-2px) scale(1.04);box-shadow:0 12px 36px rgba(244,196,48,.45)}
+.btn-vote.on{background:rgba(244,196,48,.18);color:var(--gold);border:2px solid var(--gold);box-shadow:none}
+.mc-cats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.mcat{padding:7px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:rgba(255,255,255,.07);transition:all .2s}
+.mcat:hover{border-color:var(--gold-b);background:var(--gold-pale);color:var(--white)}
+.mcat.on{background:var(--gold);border-color:var(--gold);color:var(--blue)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--blue-3);border:1px solid rgba(255,255,255,.15);color:var(--white);padding:11px 26px;font-size:13px;font-weight:600;border-radius:100px;z-index:9999;transition:transform .35s cubic-bezier(.16,1,.3,1);white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#166534;border-color:rgba(46,204,113,.3)}
+.toast.err{background:#7F1D1D;border-color:rgba(192,40,32,.4)}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  .nav{padding:0 18px}.nlinks,.ncta{display:none}.ham{display:block}
+  .hero{padding:80px 20px 56px}
+  .stats-strip,.proj-hero,.fbar,.grid-wrap,.board-wrap{padding-right:18px;padding-left:18px}
+  .grid-wrap{padding-top:28px;padding-bottom:56px}
+  .nf-grid{grid-template-columns:1fr;gap:16px}
+  .stats-in{grid-template-columns:1fr 1fr;gap:16px}
+  .podium{grid-template-columns:1fr}
+  .bt-head,.bt-row{grid-template-columns:44px 1fr 60px 60px}
+  .bt-hc:nth-child(n+4),.bt-row>*:nth-child(n+4){display:none}
+  .mc{padding:20px}
+  .mc-stats{grid-template-columns:1fr 1fr}
+  .story-lines{gap:8px}
+  .mwrap{padding:0 14px 60px}
+}
+@media(max-width:480px){
+  .h-title{font-size:36px}
+  .board-tabs .btab{padding:7px 13px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="cur-r"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-logo">TED-<b>AI</b></div>
+  <div class="ld-sub">أصوات تصنع الأثر</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nbrand" onclick="goPage('land')">
+    <div class="nmark">T</div>
+    <div>
+      <div class="ntitle">TED-<em>AI</em> Stage</div>
+      <div class="nsub">كلية القاسمي · أصوات التغيير</div>
+    </div>
+  </div>
+  <div class="nlinks">
+    <button class="nlink on" onclick="goPage('land')">الرئيسية</button>
+    <button class="nlink" onclick="goPage('proj')">المشاريع</button>
+    <button class="nlink" onclick="goPage('board')">النتائج</button>
+  </div>
+  <button class="ncta" onclick="goPage('proj')">شاهد المبادرات</button>
+  <button class="ham" id="ham" onclick="toggleMenu()">☰</button>
+</nav>
+<div class="mnav" id="mnav">
+  <button class="nlink" onclick="goPage('land')">الرئيسية</button>
+  <button class="nlink" onclick="goPage('proj')">المشاريع</button>
+  <button class="nlink" onclick="goPage('board')">النتائج</button>
+  <button class="ncta" onclick="goPage('proj')" style="border-radius:100px;padding:13px;text-align:center;margin-top:16px">شاهد المبادرات</button>
+</div>
+
+<!-- ══ LANDING ══ -->
+<div class="pg on" id="pg-land">
+  <div class="land-bg">
+    <div class="bg-base"></div>
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+    <div class="bg-orb orb3"></div>
+    <div class="bg-dots"></div>
+  </div>
+
+  <div class="hero">
+    <div class="h-eyebrow">كلية القاسمي الأكاديمية · التربية غير المنهجية · 2025</div>
+    <h1 class="h-title">أصوات<br><span class="gold">تصنع الأثر</span></h1>
+    <p class="h-quote">
+      ليست كل الأفكار تحتاج تمويلًا…<br>
+      بعضها يحتاج فقط أن <em style="font-style:normal;color:var(--gold)">تُسمع</em>
+    </p>
+    <button class="h-btn" onclick="goPage('proj')">
+      <span>ابدأ التجربة</span>
+      <div class="h-btn-arr">←</div>
+    </button>
+    <div class="h-hint">18 مبادرة · ادخل · شاهد · اشعر · وقرّر من يستحق أن يُسمع</div>
+  </div>
+
+  <div class="scroll-hint" onclick="goPage('proj')">
+    <span>اكتشف</span>
+    <div class="scroll-line"></div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stats-in">
+      <div class="stat"><span class="stat-n" id="s1">18</span><div class="stat-l">مبادرة طلابية</div></div>
+      <div class="stat"><span class="stat-n" id="s2">97</span><div class="stat-l">تصويت جمهور</div></div>
+      <div class="stat"><span class="stat-n" id="s3">5,740</span><div class="stat-l">مستفيد متوقع</div></div>
+      <div class="stat"><span class="stat-n" id="s4">680</span><div class="stat-l">مشاهدة</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROJECTS ══ -->
+<div class="pg" id="pg-proj">
+  <div class="proj-hero">
+    <div class="ph-in">
+      <div class="ph-ey">TED-AI Stage · 2025</div>
+      <h1 class="ph-h">مشاريع التغيير</h1>
+      <p class="ph-s">ادخل · شاهد · اشعر · وقرّر من يستحق أن يُسمع</p>
+    </div>
+  </div>
+  <div class="fbar">
+    <button class="fb on" onclick="setF('all',this)">الكل</button>
+    <button class="fb" onclick="setF('health',this)">🟣 دعم نفسي</button>
+    <button class="fb" onclick="setF('education',this)">🔵 تعليم</button>
+    <button class="fb" onclick="setF('tech',this)">🟢 تكنولوجيا</button>
+    <button class="fb" onclick="setF('community',this)">🟡 مجتمعي</button>
+  </div>
+  <div class="grid-wrap">
+    <div class="nf-grid" id="grid"></div>
+    <div id="empty" style="display:none;text-align:center;padding:72px 0;color:rgba(255,255,255,.3);font-size:16px">لا توجد مشاريع في هذه الفئة</div>
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD ══ -->
+<div class="pg" id="pg-board">
+  <div class="board-wrap">
+    <div class="ph-ey" style="margin-bottom:14px">النتائج المباشرة</div>
+    <h2 style="font-size:clamp(26px,3.5vw,44px);font-weight:900;color:var(--white);letter-spacing:-.03em;margin-bottom:12px">الأفكار الأكثر تأثيرًا</h2>
+    <p style="font-size:15px;color:rgba(255,255,255,.4);max-width:480px;line-height:1.85;margin-bottom:32px">الترتيب يعكس تصويت الجمهور والتقييم النجمي والمشاهدات — يتحدث مع كل تصويت.</p>
+    <div class="board-tabs">
+      <button class="btab on" onclick="setBtab('overall',this)">📊 الترتيب العام</button>
+      <button class="btab" onclick="setBtab('impact',this)">🥇 الأكثر إلهامًا</button>
+      <button class="btab" onclick="setBtab('creative',this)">💡 الأكثر ابتكارًا</button>
+      <button class="btab" onclick="setBtab('audience',this)">❤️ اختيار الجمهور</button>
+    </div>
+    <div class="podium" id="podium"></div>
+    <div class="board-tbl" id="btbl"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mov" id="modal">
+  <div class="mwrap">
+    <button class="mback" onclick="closeMod()">← العودة إلى المشاريع</button>
+    <div class="mbox" id="mbox"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── CURSOR ── */
+const c=document.getElementById('cur'),cr=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.cssText=`left:${mx}px;top:${my}px`});
+(function tick(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;cr.style.cssText=`left:${rx}px;top:${ry}px`;requestAnimationFrame(tick)})();
+
+/* ── LOADER ── */
+window.addEventListener('load',()=>setTimeout(()=>document.getElementById('loader').classList.add('out'),1700));
+
+/* ── NAV ── */
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('s',scrollY>10));
+function toggleMenu(){const m=document.getElementById('mnav');m.classList.toggle('open');document.getElementById('ham').textContent=m.classList.contains('open')?'✕':'☰'}
+
+/* ── DATA ── */
+const DATA=[
+  {id:1,title:'نافذة للتنفس',name:'شروق أبو فرح',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'ش',bg:'linear-gradient(135deg,#1A0B3A 0%,#0B1F3A 100%)',problem:'ضغط نفسي حاد لدى الطلاب دون مساحة تعبير',idea:'غرفة آمنة للتعبير بعيدًا عن الحكم والانتقاد',impact:'تحسين الصحة النفسية وفتح مساحة حرة للتعبير',impactN:120,ai:'مبادرة تعالج الصحة النفسية الصامتة — فضاء آمن يتوافق مع نموذج Peer Support المدعوم بالأبحاث.',url:'',votes:8,stars:4.2,views:45,cv:{i:5,c:3,a:4},voted:false,sv:0,catV:null,badges:['top-impact']},
+  {id:2,title:'ركن الاستماع',name:'ريئام ناطور',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'ر',bg:'linear-gradient(135deg,#0B2A3A 0%,#0B1F3A 100%)',problem:'غياب مساحة آمنة للتعبير عن المشاعر',idea:'جلسات استماع سرية ودورية بين الطلاب',impact:'تقليل التوتر وتعزيز الصحة النفسية',impactN:160,ai:'جلسات الاستماع السرية نهج مثبت بحثيًا في خفض التوتر.',url:'',votes:6,stars:3.9,views:38,cv:{i:4,c:2,a:3},voted:false,sv:0,catV:null,badges:['audience-choice']},
+  {id:3,title:'فضفضة بدون خوف',name:'سدين قضماني',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'س',bg:'linear-gradient(135deg,#1A1A3A 0%,#0B1F3A 100%)',problem:'عدم القدرة على التعبير عن المشاعر بحرية',idea:'صندوق أسرار رقمي وجلسات تعبير آمنة',impact:'دعم نفسي وتحرير من العبء العاطفي',impactN:200,ai:'الصندوق السري كأداة تربوية ذكية — التعبير دون خوف يفتح مسار الصحة النفسية.',url:'',votes:5,stars:4.1,views:32,cv:{i:3,c:2,a:3},voted:false,sv:0,catV:null,badges:[]},
+  {id:4,title:'مساحة آمنة',name:'شهد أغباريه',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'ش',bg:'linear-gradient(135deg,#0B3A1A 0%,#0B1F3A 100%)',problem:'نقص الدعم النفسي في البيئة الجامعية',idea:'لقاءات أسبوعية للاستماع والمشاركة',impact:'راحة نفسية واستقرار عاطفي',impactN:240,ai:'اللقاءات الأسبوعية تبني رأس مال اجتماعي حقيقي يعزز الصمود النفسي.',url:'',votes:7,stars:4.0,views:41,cv:{i:4,c:3,a:4},voted:false,sv:0,catV:null,badges:['most-applicable']},
+  {id:5,title:'جلسة دعم Zoom',name:'دانا',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'د',bg:'linear-gradient(135deg,#1A100B 0%,#0B1F3A 100%)',problem:'ضعف التفاعل وشعور العزلة لدى الطلاب',idea:'جلسات دعم تفاعلية أسبوعية عبر Zoom',impact:'زيادة التفاعل وتقليل الوحدة',impactN:280,ai:'التكنولوجيا تكسر حواجز الوصول للدعم النفسي — نموذج قابل للتوسع.',url:'',votes:4,stars:3.7,views:28,cv:{i:2,c:2,a:2},voted:false,sv:0,catV:null,badges:[]},
+  {id:6,title:'مساحة آمنة رقمية',name:'مجموعة طلابية',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'م',bg:'linear-gradient(135deg,#0A0A2A 0%,#0B1F3A 100%)',problem:'صعوبة الوصول للدعم النفسي التقليدي',idea:'منصة دعم رقمية مجهولة الهوية',impact:'استمرارية الدعم للفئات التي تتجنب الدعم التقليدي',impactN:320,ai:'الدعم الرقمي المجهول يُزيل وصمة طلب المساعدة.',url:'',votes:3,stars:3.8,views:25,cv:{i:2,c:1,a:2},voted:false,sv:0,catV:null,badges:[]},
+  {id:7,title:'أنا هون',name:'دارين طه',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'د',bg:'linear-gradient(135deg,#1A0B3A 0%,#0F2847 100%)',problem:'شعور بالوحدة والانفصال عن المجتمع',idea:'لقاءات دعم دورية ونشاطات انتماء جماعية',impact:'تعزيز الانتماء والتواصل الإنساني الحقيقي',impactN:360,ai:'مبادرة تعالج وباء الوحدة الجامعية — الحضور البشري الحقيقي لا يُعوَّض.',url:'',votes:9,stars:4.3,views:52,cv:{i:6,c:3,a:5},voted:false,sv:0,catV:null,badges:['ai-pick']},
+  {id:8,title:'مبرمج المستقبل',name:'آية جزماوي',year:'السنة الأولى',cat:'tech',topic:'التكنولوجيا والمجتمع',init:'آ',bg:'linear-gradient(135deg,#0B3A1A 0%,#0B2A18 100%)',problem:'صعوبة تعلم البرمجة للمبتدئين',idea:'ورش تعلم تفاعلية بأسلوب اللعب',impact:'فهم أعمق للتكنولوجيا وتجسير الهوة الرقمية',impactN:400,ai:'تعليم البرمجة بالألعاب يرفع الدافعية ثلاثة أضعاف — نموذج مثبت دوليًا.',url:'',votes:5,stars:4.0,views:35,cv:{i:3,c:4,a:3},voted:false,sv:0,catV:null,badges:['most-creative']},
+  {id:9,title:'نادي القراءة',name:'عروب',year:'السنة الأولى',cat:'education',topic:'التربية والتعليم',init:'ع',bg:'linear-gradient(135deg,#1A1A0B 0%,#0F1A2A 100%)',problem:'ضعف مهارات القراءة والفهم لدى الأطفال',idea:'أنشطة قراءة تفاعلية وجلسات نقاش جماعية',impact:'تنمية التفكير النقدي والتعبير',impactN:440,ai:'نادي القراءة يُنمي التفكير النقدي — النقاش الجماعي يعمّق الفهم أكثر من القراءة الفردية.',url:'',votes:4,stars:3.8,views:30,cv:{i:2,c:2,a:2},voted:false,sv:0,catV:null,badges:[]},
+  {id:10,title:'ورشة التنمر',name:'عروب',year:'السنة الأولى',cat:'education',topic:'التربية والتعليم',init:'ع',bg:'linear-gradient(135deg,#0B1A3A 0%,#0B1F3A 100%)',problem:'انتشار ظاهرة التنمر في المدارس',idea:'ورشة توعوية وتدريبية مكثفة',impact:'تقليل التنمر وتعزيز ثقافة التعاطف',impactN:480,ai:'ورش مكافحة التنمر الأكثر فاعلية تجمع الوعي مع مهارات التدخل المباشر.',url:'',votes:6,stars:4.1,views:37,cv:{i:4,c:2,a:3},voted:false,sv:0,catV:null,badges:[]},
+  {id:11,title:'التمكين الرقمي',name:'مصطفى مصلح',year:'السنة الأولى',cat:'tech',topic:'التكنولوجيا والمجتمع',init:'م',bg:'linear-gradient(135deg,#0A2A0A 0%,#0B2A18 100%)',problem:'ضعف الوعي والأمان الرقمي',idea:'تدريب تقني عملي ومبسط للفئات المهمشة رقميًا',impact:'تمكين رقمي وحماية من الاحتيال الإلكتروني',impactN:520,ai:'التمكين الرقمي للنساء وكبار السن يكسر حواجز الاستبعاد — أثر مضاعف.',url:'',votes:5,stars:3.9,views:33,cv:{i:3,c:2,a:3},voted:false,sv:0,catV:null,badges:['most-applicable']},
+  {id:12,title:'بسمة أمل',name:'نبأ ناطور',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'ن',bg:'linear-gradient(135deg,#0A0A3A 0%,#0B1F3A 100%)',problem:'وحدة الأطفال المرضى في المستشفيات',idea:'زيارات دعم وأنشطة ترفيهية هادفة',impact:'رفع المعنويات وتسريع الشفاء',impactN:560,ai:'الدعم الإنساني في المستشفيات محوّل فعلي — الأدلة تثبت أن الدعم العاطفي يُسرّع التعافي.',url:'',votes:7,stars:4.5,views:48,cv:{i:5,c:2,a:4},voted:false,sv:0,catV:null,badges:[]},
+  {id:13,title:'نحن معكم',name:'ميس ناصر',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'م',bg:'linear-gradient(135deg,#1A0B2A 0%,#0B1F3A 100%)',problem:'نقص الدعم لنزلاء دور الرعاية',idea:'زيارات علاجية ولقاءات أسبوعية دافئة',impact:'دعم نفسي وتقليل عزلة كبار السن',impactN:600,ai:'الزيارات المنتظمة تبني روابط تعوّض الانفصال الأسري — أثر نفسي ملموس.',url:'',votes:6,stars:4.2,views:42,cv:{i:4,c:2,a:3},voted:false,sv:0,catV:null,badges:['top-impact']},
+  {id:14,title:'إطعام الحيوانات',name:'سما كبها',year:'السنة الأولى',cat:'community',topic:'خدمة المجتمع',init:'س',bg:'linear-gradient(135deg,#2A1A0B 0%,#1A1208 100%)',problem:'إهمال الحيوانات الضالة وانعدام الرعاية',idea:'حملة منظمة لتوزيع الطعام والرعاية',impact:'رعاية الحيوانات وتعزيز ثقافة المسؤولية',impactN:640,ai:'رعاية الحيوانات تُنمّي المسؤولية والتعاطف — مواطنة بيئية بالفعل لا بالكلام.',url:'',votes:3,stars:3.6,views:22,cv:{i:2,c:1,a:1},voted:false,sv:0,catV:null,badges:[]},
+  {id:15,title:'مستقبلي بيدي',name:'مجموعة طلابية',year:'السنة الأولى',cat:'education',topic:'التربية والتعليم',init:'م',bg:'linear-gradient(135deg,#1A180B 0%,#0F1A2A 100%)',problem:'ضعف الثقة بالنفس وغموض الأهداف',idea:'نشاط تعبير إبداعي وتحفيزي مبني على الأحلام',impact:'تعزيز الثقة وتوضيح الرؤية الشخصية',impactN:680,ai:'التعبير الإبداعي يُغيّر المسار الأكاديمي — تدخل مبكر بأثر طويل المدى.',url:'',votes:4,stars:3.9,views:29,cv:{i:3,c:2,a:2},voted:false,sv:0,catV:null,badges:[]},
+  {id:16,title:'ساعة ألعاب',name:'سارة',year:'السنة الأولى',cat:'health',topic:'الصحة المجتمعية',init:'س',bg:'linear-gradient(135deg,#1A100B 0%,#0B1F3A 100%)',problem:'التوتر المتراكم وضغط الدراسة',idea:'ألعاب تفاعلية وأنشطة ترفيهية هادفة',impact:'تخفيف التوتر وتعزيز التواصل الاجتماعي',impactN:720,ai:'الترفيه الهادف استراتيجية إدارة ضغط مُثبتة — الألعاب تُعيد الطاقة وتبني علاقات.',url:'',votes:5,stars:3.8,views:31,cv:{i:3,c:2,a:2},voted:false,sv:0,catV:null,badges:['most-creative']},
+  {id:17,title:'على نياتكم ترزقون',name:'سجود عسلي',year:'السنة الأولى',cat:'education',topic:'التربية والتعليم',init:'س',bg:'linear-gradient(135deg,#0B1A0B 0%,#0F1A2A 100%)',problem:'ضعف الدافعية والإحساس بالهدف',idea:'جلسات كتابة النوايا والأحلام والتحفيز الذاتي',impact:'تحفيز داخلي عميق وتوضيح الرؤية الشخصية',impactN:760,ai:'كتابة النوايا تُفعّل الهدف الداخلي — تقنية مُثبتة في علم النفس الإيجابي.',url:'',votes:6,stars:4.0,views:36,cv:{i:4,c:3,a:3},voted:false,sv:0,catV:null,badges:[]},
+  {id:18,title:'توزيع هدايا',name:'آلاء ونائلة',year:'السنة الأولى',cat:'community',topic:'خدمة المجتمع',init:'آ',bg:'linear-gradient(135deg,#1A0B0B 0%,#1A1208 100%)',problem:'ضعف الروابط الاجتماعية وانتشار السلبية',idea:'توزيع هدايا رمزية ومفاجآت إيجابية',impact:'نشر الإيجابية وتعزيز التواصل الإنساني',impactN:800,ai:'الهدايا الرمزية تُحدث تأثير الفراشة — لفتة صغيرة تُطلق موجة إيجابية.',url:'',votes:4,stars:3.7,views:27,cv:{i:2,c:2,a:2},voted:false,sv:0,catV:null,badges:[]},
+];
+const BM={'top-impact':{l:'🏆 Top Impact',c:'b-gold'},'ai-pick':{l:'⬡ AI Pick',c:'b-purple'},'audience-choice':{l:'❤ اختيار الجمهور',c:'b-purple'},'most-creative':{l:'💡 الأكثر إبداعًا',c:'b-green'},'most-applicable':{l:'✅ الأكثر تطبيقًا',c:'b-green'}};
+const $=id=>document.getElementById(id);
+const fin=p=>Math.round(p.votes*.5+p.stars*8+p.views*.02);
+function toast(msg,t=''){const e=$('toast');e.textContent=msg;e.className='toast show '+t;setTimeout(()=>e.classList.remove('show'),3000)}
+
+/* STORAGE SYNC */
+function syncStore(){
+  try{const s=localStorage.getItem('ted-ai-projects');if(s){const d=JSON.parse(s);if(d?.length){DATA.length=0;d.forEach(p=>DATA.push(p))}}}catch(e){}
+}
+function persist(id){
+  try{const s=JSON.parse(localStorage.getItem('ted-ai-projects')||'[]');const i=s.findIndex(p=>p.id===id);const cur=DATA.find(p=>p.id===id);if(i!==-1&&cur){s[i]={...s[i],votes:cur.votes,voted:cur.voted,stars:cur.stars,cv:cur.cv,catV:cur.catV,views:cur.views};localStorage.setItem('ted-ai-projects',JSON.stringify(s))}}catch(e){}
+}
+
+/* NAV */
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nlink').forEach(b=>b.classList.remove('on'));
+  $('pg-'+id).classList.add('on');
+  const map={land:0,proj:1,board:2};
+  const btns=document.querySelectorAll('.nlink');
+  if(map[id]!==undefined)btns[map[id]]?.classList.add('on');
+  window.scrollTo(0,0);
+  $('mnav').classList.remove('open');$('ham').textContent='☰';
+  if(id==='proj')renderGrid();
+  if(id==='board')renderBoard('overall');
+  updStats();
+}
+
+/* STATS */
+function updStats(){
+  $('s1').textContent=DATA.length;
+  $('s2').textContent=DATA.reduce((a,p)=>a+p.votes,0);
+  $('s3').textContent=DATA.reduce((a,p)=>a+p.impactN,0).toLocaleString('ar');
+  $('s4').textContent=DATA.reduce((a,p)=>a+p.views,0);
+}
+
+/* GRID */
+let curF='all';
+function renderGrid(f){
+  f=f||curF;
+  let list=[...DATA];if(f!=='all')list=list.filter(p=>p.cat===f);
+  list.sort((a,b)=>fin(b)-fin(a));
+  const empty=$('empty');
+  if(!list.length){$('grid').innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  $('grid').innerHTML=list.map((p,i)=>{
+    const badge=p.badges.slice(0,1).map(b=>{const c=BM[b];return c?`<div class="pc-badge ${c.c}">${c.l}</div>`:''}).join('');
+    const stars=[1,2,3,4,5].map(j=>`<span class="star ${j<=Math.round(p.sv||p.stars)?'on':''}" onclick="event.stopPropagation();rateStar(${p.id},${j})">★</span>`).join('');
+    return`<div class="pc" data-cat="${p.cat}" onclick="openMod(${p.id})" style="animation-delay:${i*.05}s">
+      <div class="pc-thumb">
+        <div class="pc-bg" style="background:${p.bg}"></div>
+        <div class="pc-ov"><div class="pc-play">▶</div></div>
+        ${i<3?`<div class="pc-rank">${i+1}</div>`:''}
+        ${badge}
+        <div class="pc-hover"><div class="pc-hover-txt">${p.problem}</div></div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">${p.topic}</div>
+        <div class="pc-title">${p.title}</div>
+        <div class="pc-student">${p.name} · ${p.year} · 👁 ${p.views}</div>
+        <div class="pc-ai"><div class="pc-ai-lbl">⬡ AI Insight</div><div class="pc-ai-txt">${p.ai}</div></div>
+        <div class="cvotes">
+          <button class="cv ${p.catV==='i'?'on':''}" onclick="event.stopPropagation();catV(${p.id},'i',this)">🌍 تأثير ${p.cv.i}</button>
+          <button class="cv ${p.catV==='c'?'on':''}" onclick="event.stopPropagation();catV(${p.id},'c',this)">💡 إبداع ${p.cv.c}</button>
+          <button class="cv ${p.catV==='a'?'on':''}" onclick="event.stopPropagation();catV(${p.id},'a',this)">✅ تطبيق ${p.cv.a}</button>
+        </div>
+        <div class="stars">${stars}</div>
+        <div class="pc-footer">
+          <div><div class="pc-score">${p.votes}</div><div class="pc-score-l">تصويت</div></div>
+          <button class="vbtn ${p.voted?'on':''}" onclick="event.stopPropagation();doVote(${p.id},this)">${p.voted?'❤ صوّتت':'❤ صوّت'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setF(f,btn){curF=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderGrid(f)}
+
+/* VOTING */
+function doVote(id,btn){const p=DATA.find(x=>x.id===id);if(p.voted){toast('لقد صوّتت بالفعل ❤','err');return}p.votes++;p.voted=true;btn.classList.add('on');btn.textContent='❤ صوّتت';toast('❤ تم تسجيل تصويتك! شكرًا','ok');updStats();persist(id)}
+function rateStar(id,v){const p=DATA.find(x=>x.id===id);p.sv=v;p.stars=(p.stars*3+v)/4;toast(`⭐ أعطيت ${v}/5 نجوم`,'ok');persist(id);renderGrid()}
+function catV(id,cat,btn){const p=DATA.find(x=>x.id===id);if(p.catV===cat){toast('صوّتت بالفعل هنا','err');return}if(p.catV)p.cv[p.catV]--;p.cv[cat]++;p.catV=cat;const labels={i:'🌍 الأكثر تأثيرًا',c:'💡 الأكثر ابتكارًا',a:'✅ الأكثر تطبيقًا'};toast(labels[cat],'ok');persist(id);renderGrid()}
+
+/* MODAL */
+function openMod(id){
+  const p=DATA.find(x=>x.id===id);p.views++;
+  const badges=p.badges.map(b=>{const c=BM[b];return c?`<span style="display:inline-block;padding:4px 12px;border-radius:100px;font-size:10px;font-weight:700;margin-bottom:4px" class="pc-badge ${c.c}">${c.l}</span>`:''}).join(' ');
+  const stars=[1,2,3,4,5].map(j=>`<span class="star ${j<=Math.round(p.stars)?'on':''}" onclick="rateStar(${p.id},${j})" style="font-size:22px">★</span>`).join('');
+  $('mbox').innerHTML=`
+  <div class="mv-vid" onclick="playVid(${p.id})" style="background:${p.bg}">
+    <div class="mv-bg" style="background:${p.bg}"></div>
+    <div class="mv-ov"><div class="mv-play">▶</div></div>
+    <div class="mv-lbl">${p.topic} · ${p.year}</div>
+  </div>
+  <div class="mc">
+    <div class="mc-ey">${p.topic}</div>
+    <div class="mc-title">${p.title}</div>
+    <div class="mc-meta">${p.name} · ${p.year} · 👁 ${p.views} مشاهدة</div>
+    ${badges?`<div style="margin-bottom:16px">${badges}</div>`:''}
+    <div class="story-lines">
+      <div class="story-line"><div class="sl-ico">🌍</div><div><div class="sl-lbl">المشكلة</div><div class="sl-val">${p.problem}</div></div></div>
+      <div class="story-line"><div class="sl-ico">💡</div><div><div class="sl-lbl">المبادرة</div><div class="sl-val">${p.idea}</div></div></div>
+      <div class="story-line"><div class="sl-ico">✨</div><div><div class="sl-lbl">الأثر المتوقع</div><div class="sl-val">${p.impact}</div></div></div>
+    </div>
+    <div class="mc-stats">
+      <div class="mcs"><span class="mcs-n">${p.votes}</span><div class="mcs-l">تصويت</div></div>
+      <div class="mcs"><span class="mcs-n">${p.stars.toFixed(1)}</span><div class="mcs-l">تقييم نجمي</div></div>
+      <div class="mcs"><span class="mcs-n">${p.views}</span><div class="mcs-l">مشاهدة</div></div>
+    </div>
+    <div class="mc-emotion">
+      <div class="mc-emo-txt">"لو وصلت هذه الفكرة لشخص واحد…<br><em>قد تغيّر حياته"</em></div>
+    </div>
+    <div class="mc-vote">
+      <div class="mc-vote-h">هذا المشروع يستحق أن ينتشر</div>
+      <div class="mc-vote-s">صوّتك يرسل رسالة: هذه الفكرة مهمة وتستحق الدعم والتطبيق</div>
+      <div><button class="btn-vote ${p.voted?'on':''}" onclick="doVote(${p.id},this)">${p.voted?'❤ صوّتت بالفعل':'❤ أصوّت لهذا المشروع'}</button></div>
+      <div style="display:flex;justify-content:center;gap:3px;margin-bottom:18px">${stars}</div>
+      <div class="mc-cats">
+        <button class="mcat ${p.catV==='i'?'on':''}" onclick="catV(${p.id},'i',this)">🌍 الأكثر تأثيرًا</button>
+        <button class="mcat ${p.catV==='c'?'on':''}" onclick="catV(${p.id},'c',this)">💡 الأكثر ابتكارًا</button>
+        <button class="mcat ${p.catV==='a'?'on':''}" onclick="catV(${p.id},'a',this)">✅ اختياري للتطبيق</button>
+      </div>
+    </div>
+  </div>`;
+  $('modal').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeMod(){$('modal').classList.remove('open');document.body.style.overflow=''}
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeMod()});
+function playVid(id){const p=DATA.find(x=>x.id===id);if(p.url)window.open(p.url,'_blank');else toast('⚠ الفيديو لم يُرفع بعد — أضيفيه من لوحة التحكم','err')}
+
+/* LEADERBOARD */
+function renderBoard(mode){
+  let list=[...DATA];
+  if(mode==='impact')list.sort((a,b)=>b.cv.i-a.cv.i);
+  else if(mode==='creative')list.sort((a,b)=>b.cv.c-a.cv.c);
+  else if(mode==='audience')list.sort((a,b)=>b.votes-a.votes);
+  else list.sort((a,b)=>fin(b)-fin(a));
+  const medals=['🥇','🥈','🥉'],top=list.slice(0,3);
+  const ord=top.length>=3?[top[1],top[0],top[2]]:top;
+  const pcls=['pod pod-1','pod pod-2','pod pod-3'];
+  $('podium').innerHTML=ord.map((p,i)=>{
+    const ri=top.indexOf(p);
+    const sc=mode==='impact'?p.cv.i:mode==='creative'?p.cv.c:mode==='audience'?p.votes:fin(p);
+    return`<div class="${pcls[i]}"><div class="pod-glow"></div><div class="pod-medal">${medals[ri]}</div><div class="pod-name">${p.name.split(' ')[0]}</div><div class="pod-title">${p.title}</div><span class="pod-score">${sc}</span><div class="pod-lbl">${mode==='impact'?'تأثير':mode==='creative'?'إبداع':mode==='audience'?'تصويت':'نقطة'}</div></div>`;
+  }).join('');
+  const max=list[0]?fin(list[0]):1;
+  $('btbl').innerHTML=`<div class="bt-head"><div class="bt-hc">#</div><div class="bt-hc">المشروع</div><div class="bt-hc" style="text-align:center">❤</div><div class="bt-hc" style="text-align:center">⭐</div><div class="bt-hc" style="text-align:center">👁</div><div class="bt-hc">التقدم</div></div>`+
+  list.map((p,i)=>{const f=fin(p);const pct=max?f/max*100:0;return`<div class="bt-row ${i<3?'top':''}" onclick="openMod(${p.id})"><div class="bt-rank">${i<3?medals[i]:i+1}</div><div><div class="bt-t">${p.title}</div><div class="bt-s">${p.name}</div></div><div class="bt-col">${p.votes}</div><div class="bt-col">${p.stars.toFixed(1)}</div><div class="bt-col">${p.views}</div><div><div class="bt-bar-bg"><div class="bt-bar-fill" style="width:${pct}%"></div></div></div></div>`;}).join('');
+}
+function setBtab(mode,btn){document.querySelectorAll('.btab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderBoard(mode)}
+
+/* INIT */
+syncStore();updStats();
+</script>
+</body>
+</html>
