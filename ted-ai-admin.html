@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — TED-AI Stage</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0A0806;--deep:#100E0A;--surface:#181410;--card:#201B14;
+  --line:rgba(255,220,160,.08);--line2:rgba(255,220,160,.16);
+  --gold:#C8861A;--gold2:#E5A030;--gold3:#F5C060;
+  --cream:#F5EDD8;--off:#C8BAA0;--muted:#887060;--muted2:#604840;
+  --red:#C02820;--red2:#E03030;
+  --green:#1A8A44;--green2:#22C870;
+  --blue:#1860C8;--blue2:#4090F0;
+  --orange:#E07020;
+  --white:#FFF;
+  --fb:'IBM Plex Sans Arabic',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+}
+html{-webkit-font-smoothing:antialiased}
+body{background:var(--ink);color:var(--cream);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh}
+::selection{background:var(--gold);color:var(--ink)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+button,input,textarea,select{font-family:var(--fb)}
+
+/* ── LOGIN ── */
+.login-page{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:var(--ink);
+  position:relative;overflow:hidden;
+}
+.login-page::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(200,134,26,.08) 0%,transparent 60%);
+}
+.login-box{
+  position:relative;z-index:1;
+  width:100%;max-width:400px;
+  background:var(--card);
+  border:1px solid var(--line2);
+  border-top:2px solid var(--gold);
+  border-radius:16px;
+  padding:36px;
+  box-shadow:0 24px 64px rgba(0,0,0,.6);
+}
+.l-brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.l-mark{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,var(--gold),var(--gold3));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:700;color:var(--ink);
+}
+.l-name{font-size:18px;font-weight:700;color:var(--cream)}
+.l-name em{font-style:normal;color:var(--gold)}
+.l-title{font-size:20px;font-weight:700;color:var(--cream);margin-bottom:6px}
+.l-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+.l-field{margin-bottom:16px}
+.l-field label{display:block;font-family:var(--fm);font-size:10px;color:rgba(255,220,160,.4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+.l-field input{
+  width:100%;padding:12px 14px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);
+  border-radius:8px;color:var(--cream);font-size:15px;
+  outline:none;transition:border-color .2s;
+}
+.l-field input:focus{border-color:rgba(200,134,26,.5);background:rgba(255,255,255,.09)}
+.l-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;color:var(--ink);font-size:15px;font-weight:700;
+  border-radius:10px;cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 16px rgba(200,134,26,.35);
+  margin-top:8px;
+}
+.l-btn:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(200,134,26,.45)}
+.l-err{
+  display:none;margin-top:12px;padding:10px 14px;
+  background:rgba(192,40,32,.12);border:1px solid rgba(192,40,32,.3);
+  border-radius:8px;font-size:13px;color:#FF8070;text-align:center;
+}
+.l-hint{margin-top:20px;padding:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px}
+.l-hint-h{font-family:var(--fm);font-size:9px;color:rgba(255,220,160,.3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px}
+.l-hint-p{font-size:12px;color:var(--muted);line-height:1.7}
+.l-hint code{color:var(--gold);background:rgba(200,134,26,.1);padding:1px 6px;border-radius:4px;font-family:var(--fm)}
+.l-back{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--muted);cursor:pointer;transition:color .2s;text-decoration:none}
+.l-back:hover{color:var(--cream)}
+
+/* ── ADMIN SHELL ── */
+.admin-shell{display:none;min-height:100vh;flex-direction:column}
+.admin-shell.show{display:flex}
+
+/* TOP BAR */
+.admin-bar{
+  height:56px;background:rgba(10,8,6,.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:sticky;top:0;z-index:100;flex-shrink:0;
+}
+.ab-brand{display:flex;align-items:center;gap:10px}
+.ab-mark{width:28px;height:28px;background:linear-gradient(135deg,var(--gold),var(--gold3));border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink)}
+.ab-name{font-size:15px;font-weight:700;color:var(--cream)}
+.ab-name em{font-style:normal;color:var(--gold)}
+.ab-badge{font-family:var(--fm);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;background:rgba(200,134,26,.12);border:1px solid rgba(200,134,26,.25);border-radius:100px;color:var(--gold);margin-right:4px}
+.ab-tabs{display:flex;gap:2px;margin-right:auto}
+.ab-tab{
+  padding:6px 14px;background:none;border:none;
+  font-size:13px;font-weight:500;color:var(--muted);
+  border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.ab-tab:hover{background:rgba(255,255,255,.06);color:var(--cream)}
+.ab-tab.on{background:rgba(200,134,26,.12);color:var(--gold)}
+.ab-actions{display:flex;gap:8px}
+.ab-logout{padding:6px 14px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);font-size:13px;border-radius:8px;cursor:pointer;transition:all .2s}
+.ab-logout:hover{border-color:var(--line2);color:var(--cream)}
+.view-site-btn{padding:7px 16px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;color:var(--ink);font-size:13px;font-weight:700;border-radius:100px;cursor:pointer;transition:all .2s}
+.view-site-btn:hover{transform:scale(1.03)}
+
+/* MAIN */
+.admin-main{flex:1;overflow-y:auto}
+
+/* ── TABS ── */
+.tab-panel{display:none;padding:28px}
+.tab-panel.on{display:block}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.dash-card{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:20px;position:relative;overflow:hidden;
+}
+.dash-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.dc-gold::before{background:linear-gradient(90deg,var(--gold),var(--gold3))}
+.dc-green::before{background:linear-gradient(90deg,var(--green),var(--green2))}
+.dc-blue::before{background:linear-gradient(90deg,var(--blue),var(--blue2))}
+.dc-red::before{background:linear-gradient(90deg,var(--red),var(--red2))}
+.dc-num{font-size:36px;font-weight:700;color:var(--cream);line-height:1;margin-bottom:4px}
+.dc-lbl{font-family:var(--fm);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.dc-ico{position:absolute;bottom:14px;left:16px;font-size:28px;opacity:.18}
+
+/* LIVE RESULTS */
+.results-section{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:24px}
+.rs-header{padding:16px 20px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.rs-title{font-size:14px;font-weight:700;color:var(--cream)}
+.live-badge{display:flex;align-items:center;gap:6px;font-family:var(--fm);font-size:10px;color:var(--green2);letter-spacing:.1em;text-transform:uppercase}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green2);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.result-row{display:grid;grid-template-columns:36px 1fr 80px 80px 80px 100px;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line);align-items:center;transition:background .15s}
+.result-row:hover{background:rgba(255,220,160,.03)}
+.result-row:last-child{border-bottom:none}
+.result-row.header{background:var(--surface);font-family:var(--fm);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.rr-rank{text-align:center;font-size:18px;font-weight:700;color:var(--muted2)}
+.rr-rank.top{color:var(--gold)}
+.rr-title{font-size:13px;font-weight:600;color:var(--cream);margin-bottom:2px}
+.rr-name{font-size:11px;color:var(--muted)}
+.rr-col{text-align:center;font-size:13px;font-weight:600;color:var(--off)}
+.rr-bar-wrap{}
+.rr-bar-bg{height:4px;background:rgba(255,220,160,.08);border-radius:2px;overflow:hidden}
+.rr-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold3));border-radius:2px;transition:width 1s ease}
+.rr-total{font-family:var(--fm);font-size:16px;font-weight:700;color:var(--gold2);text-align:center}
+
+/* ── PROJECTS TABLE ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.sh-title{font-size:18px;font-weight:700;color:var(--cream)}
+.btn-add{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 18px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;color:var(--ink);font-size:13px;font-weight:700;
+  border-radius:100px;cursor:pointer;transition:all .2s;
+}
+.btn-add:hover{transform:scale(1.03)}
+.search-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:0 14px;height:36px;
+  background:var(--card);border:1px solid var(--line);border-radius:100px;
+  margin-bottom:16px;
+}
+.search-bar input{background:none;border:none;color:var(--cream);font-size:13px;outline:none;width:240px}
+.search-bar input::placeholder{color:var(--muted)}
+.projects-table{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pt-header{display:grid;grid-template-columns:40px 1fr 140px 100px 100px 80px 80px 140px;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--line)}
+.pt-hc{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pt-row{display:grid;grid-template-columns:40px 1fr 140px 100px 100px 80px 80px 140px;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);align-items:center;transition:background .15s}
+.pt-row:hover{background:rgba(255,220,160,.03)}
+.pt-row:last-child{border-bottom:none}
+.pt-id{font-family:var(--fm);font-size:11px;color:var(--muted2);text-align:center}
+.pt-info{}
+.pt-title{font-size:13px;font-weight:600;color:var(--cream);margin-bottom:2px}
+.pt-student{font-size:11px;color:var(--muted)}
+.pt-topic{font-size:11px;color:var(--gold)}
+.pt-video{display:flex;align-items:center;gap:6px}
+.video-indicator{width:8px;height:8px;border-radius:50%;background:var(--muted2);flex-shrink:0}
+.video-indicator.has{background:var(--green2)}
+.pt-video-text{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.pt-col{text-align:center;font-size:13px;font-weight:600;color:var(--off)}
+.pt-actions{display:flex;gap:6px}
+.action-btn{
+  padding:5px 10px;border:none;border-radius:6px;
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;
+  white-space:nowrap;
+}
+.btn-edit{background:rgba(200,134,26,.12);color:var(--gold);border:1px solid rgba(200,134,26,.25)}
+.btn-edit:hover{background:rgba(200,134,26,.22)}
+.btn-del{background:rgba(192,40,32,.1);color:#FF8070;border:1px solid rgba(192,40,32,.25)}
+.btn-del:hover{background:rgba(192,40,32,.2)}
+.btn-link{background:rgba(24,96,200,.1);color:var(--blue2);border:1px solid rgba(24,96,200,.25)}
+.btn-link:hover{background:rgba(24,96,200,.2)}
+
+/* ── MODAL/DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+.drawer-overlay.open{display:flex;align-items:center;justify-content:center;padding:20px}
+.drawer{
+  background:var(--deep);border:1px solid var(--line2);border-radius:16px;
+  width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 24px 64px rgba(0,0,0,.7);
+}
+.drawer-top{
+  padding:18px 24px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--deep);z-index:10;
+}
+.drawer-title{font-size:16px;font-weight:700;color:var(--cream)}
+.drawer-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+.drawer-close:hover{color:var(--cream)}
+.drawer-body{padding:24px}
+.form-row{margin-bottom:18px}
+.form-row label{display:block;font-family:var(--fm);font-size:10px;color:rgba(255,220,160,.45);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.form-row label .req{color:var(--red2)}
+.form-row input,.form-row textarea,.form-row select{
+  width:100%;padding:11px 14px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);
+  border-radius:8px;color:var(--cream);font-size:14px;
+  outline:none;transition:border-color .2s;resize:vertical;appearance:none;
+}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{
+  border-color:rgba(200,134,26,.5);background:rgba(255,255,255,.09);
+}
+.form-row textarea{min-height:90px}
+.form-row select option{background:var(--deep)}
+.form-row .hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.video-preview{
+  margin-top:8px;padding:10px 14px;
+  background:rgba(200,134,26,.08);border:1px solid rgba(200,134,26,.2);
+  border-radius:8px;font-size:12px;color:var(--gold);
+  display:none;
+}
+.video-preview.show{display:block}
+.drawer-footer{
+  padding:16px 24px;border-top:1px solid var(--line);
+  display:flex;gap:10px;justify-content:flex-start;
+  position:sticky;bottom:0;background:var(--deep);
+}
+.btn-save{
+  padding:11px 24px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;color:var(--ink);font-size:14px;font-weight:700;
+  border-radius:10px;cursor:pointer;transition:all .2s;
+}
+.btn-save:hover{transform:translateY(-1px)}
+.btn-cancel{
+  padding:11px 20px;background:rgba(255,255,255,.06);
+  border:1px solid var(--line);color:var(--muted);font-size:14px;
+  border-radius:10px;cursor:pointer;transition:all .2s;
+}
+.btn-cancel:hover{border-color:var(--line2);color:var(--cream)}
+
+/* VIDEO LINK section */
+.video-section{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:24px}
+.vs-row{display:grid;grid-template-columns:1fr 1fr 48px 48px 200px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center}
+.vs-row:last-child{border-bottom:none}
+.vs-row.header{background:var(--surface);font-family:var(--fm);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.vs-title{font-size:13px;font-weight:600;color:var(--cream)}
+.vs-url-input{
+  width:100%;padding:7px 10px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);
+  border-radius:6px;color:var(--cream);font-size:12px;font-family:var(--fm);
+  outline:none;transition:border-color .2s;
+}
+.vs-url-input:focus{border-color:rgba(200,134,26,.5)}
+.vs-url-input.has-url{border-color:rgba(34,200,122,.35);background:rgba(34,200,122,.06)}
+.icon-btn{width:36px;height:36px;border:1px solid var(--line);border-radius:8px;background:none;color:var(--muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.icon-btn:hover{border-color:var(--line2);color:var(--cream)}
+.save-indicator{font-family:var(--fm);font-size:10px;color:var(--green2);display:none;white-space:nowrap}
+.save-indicator.show{display:block}
+
+/* GOOGLE SHEETS */
+.sheets-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:24px}
+.sheets-title{font-size:16px;font-weight:700;color:var(--cream);margin-bottom:6px}
+.sheets-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.65}
+.gs-steps{counter-reset:step;margin-bottom:20px}
+.gs-step{display:flex;gap:12px;margin-bottom:14px;counter-increment:step;align-items:flex-start}
+.gs-step::before{content:counter(step);min-width:24px;height:24px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink);flex-shrink:0;margin-top:1px}
+.gs-step-text{font-size:13px;color:var(--off);line-height:1.65}
+.gs-step-text code{font-family:var(--fm);font-size:11px;color:var(--gold);background:rgba(200,134,26,.1);padding:1px 6px;border-radius:4px}
+.sheets-export-btn{
+  padding:11px 24px;
+  background:linear-gradient(135deg,#1a8a44,#22c870);
+  border:none;color:#fff;font-size:14px;font-weight:700;
+  border-radius:10px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;gap:8px;
+}
+.sheets-export-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,138,68,.4)}
+.sheets-url-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+.sheets-url-label{font-family:var(--fm);font-size:10px;color:rgba(255,220,160,.4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.sheets-url-input-wrap{display:flex;gap:8px}
+.sheets-url-input{
+  flex:1;padding:10px 14px;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;
+  color:var(--cream);font-family:var(--fm);font-size:12px;
+  outline:none;transition:border-color .2s;
+}
+.sheets-url-input:focus{border-color:rgba(200,134,26,.5)}
+.sheets-connect-btn{
+  padding:10px 18px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;color:var(--ink);font-size:13px;font-weight:700;
+  border-radius:8px;cursor:pointer;white-space:nowrap;
+}
+.connected-badge{display:none;align-items:center;gap:6px;padding:8px 14px;background:rgba(34,200,122,.1);border:1px solid rgba(34,200,122,.25);border-radius:8px;font-size:12px;color:var(--green2)}
+.connected-badge.show{display:flex}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--line2);color:var(--cream);padding:11px 22px;font-size:13px;border-radius:100px;z-index:9999;transition:transform .3s cubic-bezier(.16,1,.3,1);white-space:nowrap;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#166534;border-color:rgba(34,197,94,.3)}
+.toast.err{background:var(--red);border-color:rgba(192,40,32,.4)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .pt-header,.pt-row{grid-template-columns:40px 1fr 100px 70px 70px 140px;gap:8px}
+  .pt-hc:nth-child(4),.pt-hc:nth-child(5),.pt-row .pt-col:nth-child(4),.pt-row .pt-col:nth-child(5){display:none}
+}
+@media(max-width:768px){
+  .admin-bar{padding:0 12px}
+  .ab-tabs{display:none}
+  .tab-panel{padding:16px}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .pt-header,.pt-row{grid-template-columns:1fr 80px 120px;gap:8px}
+  .pt-hc:not(:nth-child(2)):not(:nth-child(7)):not(:last-child){display:none}
+  .pt-row>*:not(.pt-info):not(.pt-col:last-of-type):not(.pt-actions){display:none}
+  .vs-row{grid-template-columns:1fr 200px 36px}
+  .vs-row>*:nth-child(2){display:none}
+  .two-col{grid-template-columns:1fr}
+  .result-row{grid-template-columns:36px 1fr 70px 100px}
+  .result-row>*:nth-child(3),.result-row>*:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div class="login-page" id="login-page">
+  <div class="login-box">
+    <div class="l-brand">
+      <div class="l-mark">T</div>
+      <div class="l-name">TED-<em>AI</em> Stage</div>
+    </div>
+    <div class="l-title">لوحة التحكم</div>
+    <div class="l-sub">أدخلي كلمة المرور للوصول إلى أدوات إدارة المشاريع والنتائج.</div>
+    <form onsubmit="doLogin(event)">
+      <div class="l-field"><label>كلمة المرور</label><input type="password" id="pw" placeholder="••••••••" required autocomplete="current-password"></div>
+      <button type="submit" class="l-btn" id="l-btn">دخول ←</button>
+    </form>
+    <div class="l-err" id="l-err">كلمة المرور غير صحيحة. حاولي مرة أخرى.</div>
+    <a href="/index.html" class="l-back">← العودة إلى المنصة</a>
+    <div class="l-hint">
+      <div class="l-hint-h">للمطوّر</div>
+      <div class="l-hint-p">كلمات المرور: <code>qasemi2025</code> أو <code>doaa2025</code> أو <code>tedai</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN SHELL ── -->
+<div class="admin-shell" id="admin-shell">
+
+  <!-- TOP BAR -->
+  <div class="admin-bar">
+    <div class="ab-brand">
+      <div class="ab-mark">T</div>
+      <div>
+        <div class="ab-name">TED-<em>AI</em> Stage</div>
+      </div>
+    </div>
+    <span class="ab-badge">Admin</span>
+    <div class="ab-tabs">
+      <button class="ab-tab on" onclick="switchTab('dashboard')">📊 الرئيسية</button>
+      <button class="ab-tab" onclick="switchTab('projects')">🎤 المشاريع</button>
+      <button class="ab-tab" onclick="switchTab('videos')">🎬 الفيديوهات</button>
+      <button class="ab-tab" onclick="switchTab('results')">🏆 النتائج</button>
+      <button class="ab-tab" onclick="switchTab('sheets')">📋 Google Sheets</button>
+    </div>
+    <div class="ab-actions">
+      <button class="view-site-btn" onclick="window.open('index.html','_blank')">👁 عرض المنصة</button>
+      <button class="ab-logout" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+
+    <!-- ════ TAB: DASHBOARD ════ -->
+    <div class="tab-panel on" id="tab-dashboard">
+      <div style="margin-bottom:20px">
+        <div style="font-size:20px;font-weight:700;color:var(--cream);margin-bottom:4px">مرحبًا د. دعاء ✦</div>
+        <div style="font-size:13px;color:var(--muted)">لوحة التحكم — TED-AI Stage | كلية القاسمي الأكاديمية</div>
+      </div>
+
+      <!-- STATS CARDS -->
+      <div class="dash-grid">
+        <div class="dash-card dc-gold">
+          <div class="dc-num" id="dc-projects">18</div>
+          <div class="dc-lbl">مشروع طلابي</div>
+          <div class="dc-ico">🎤</div>
+        </div>
+        <div class="dash-card dc-green">
+          <div class="dc-num" id="dc-votes">97</div>
+          <div class="dc-lbl">تصويت جمهور</div>
+          <div class="dc-ico">❤</div>
+        </div>
+        <div class="dash-card dc-blue">
+          <div class="dc-num" id="dc-views">680</div>
+          <div class="dc-lbl">مشاهدة إجمالية</div>
+          <div class="dc-ico">👁</div>
+        </div>
+        <div class="dash-card dc-red">
+          <div class="dc-num" id="dc-videos">0</div>
+          <div class="dc-lbl">فيديو مرفوع</div>
+          <div class="dc-ico">🎬</div>
+        </div>
+      </div>
+
+      <!-- QUICK RESULTS -->
+      <div class="results-section">
+        <div class="rs-header">
+          <div class="rs-title">🏆 النتائج الفورية — الترتيب الحالي</div>
+          <div class="live-badge"><div class="live-dot"></div>مباشر</div>
+        </div>
+        <div class="result-row header">
+          <div>#</div><div>المشروع</div>
+          <div style="text-align:center">❤ تصويت</div>
+          <div style="text-align:center">⭐ نجوم</div>
+          <div style="text-align:center">👁 مشاهدة</div>
+          <div style="text-align:center">الإجمالي</div>
+        </div>
+        <div id="quick-results"></div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: PROJECTS ════ -->
+    <div class="tab-panel" id="tab-projects">
+      <div class="section-header">
+        <div class="sh-title">إدارة المشاريع (18)</div>
+        <button class="btn-add" onclick="openAddProject()">+ إضافة مشروع</button>
+      </div>
+      <div class="search-bar">
+        <span style="color:var(--muted);font-size:14px">🔍</span>
+        <input type="text" placeholder="ابحث في المشاريع..." oninput="searchProjects(this.value)" id="search-input">
+      </div>
+      <div class="projects-table">
+        <div class="pt-header">
+          <div class="pt-hc">#</div>
+          <div class="pt-hc">المشروع</div>
+          <div class="pt-hc">الموضوع</div>
+          <div class="pt-hc" style="text-align:center">تصويت</div>
+          <div class="pt-hc" style="text-align:center">مشاهدة</div>
+          <div class="pt-hc" style="text-align:center">فيديو</div>
+          <div class="pt-hc" style="text-align:center">⭐</div>
+          <div class="pt-hc">إجراءات</div>
+        </div>
+        <div id="projects-table-body"></div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: VIDEOS ════ -->
+    <div class="tab-panel" id="tab-videos">
+      <div class="section-header">
+        <div class="sh-title">🎬 روابط الفيديوهات</div>
+        <div style="font-size:13px;color:var(--muted)">أضيفي رابط YouTube أو أي رابط فيديو لكل مشروع</div>
+      </div>
+      <div style="background:rgba(200,134,26,.08);border:1px solid rgba(200,134,26,.2);border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--gold2);line-height:1.7">
+        ✦ ألصقي رابط YouTube أو Google Drive أو أي رابط فيديو مباشر في الحقل المقابل لكل مشروع. التغييرات تُحفظ تلقائيًا.
+      </div>
+      <div class="video-section">
+        <div class="vs-row header">
+          <div>المشروع</div>
+          <div>الطالبة/الطالب</div>
+          <div style="text-align:center">حالة</div>
+          <div style="text-align:center">معاينة</div>
+          <div>رابط الفيديو</div>
+        </div>
+        <div id="videos-table"></div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: RESULTS ════ -->
+    <div class="tab-panel" id="tab-results">
+      <div class="section-header">
+        <div class="sh-title">🏆 النتائج التفصيلية</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="exportResults()" style="padding:8px 16px;background:rgba(200,134,26,.12);border:1px solid rgba(200,134,26,.25);color:var(--gold);font-size:13px;border-radius:8px;cursor:pointer">⬇ تصدير CSV</button>
+          <button onclick="renderResults()" style="padding:8px 16px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted);font-size:13px;border-radius:8px;cursor:pointer">↺ تحديث</button>
+        </div>
+      </div>
+
+      <!-- CATEGORY RESULTS -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px">
+        <div class="results-section">
+          <div class="rs-header" style="background:rgba(192,40,32,.1)">
+            <div class="rs-title" style="color:#FF8070">🌍 الأكثر تأثيرًا</div>
+          </div>
+          <div id="cat-impact"></div>
+        </div>
+        <div class="results-section">
+          <div class="rs-header" style="background:rgba(200,134,26,.08)">
+            <div class="rs-title" style="color:var(--gold2)">💡 الأكثر إبداعًا</div>
+          </div>
+          <div id="cat-creative"></div>
+        </div>
+        <div class="results-section">
+          <div class="rs-header" style="background:rgba(24,96,200,.1)">
+            <div class="rs-title" style="color:var(--blue2)">✅ الأكثر تطبيقًا</div>
+          </div>
+          <div id="cat-applicable"></div>
+        </div>
+      </div>
+
+      <!-- FULL RESULTS TABLE -->
+      <div class="results-section">
+        <div class="rs-header">
+          <div class="rs-title">📊 جدول النتائج الكامل</div>
+          <div class="live-badge"><div class="live-dot"></div>يتحدث تلقائيًا</div>
+        </div>
+        <div class="result-row header">
+          <div>#</div><div>المشروع</div>
+          <div style="text-align:center">❤</div>
+          <div style="text-align:center">⭐</div>
+          <div style="text-align:center">👁</div>
+          <div style="text-align:center">الإجمالي</div>
+        </div>
+        <div id="full-results"></div>
+      </div>
+    </div>
+
+    <!-- ════ TAB: GOOGLE SHEETS ════ -->
+    <div class="tab-panel" id="tab-sheets">
+      <div class="section-header">
+        <div class="sh-title">📋 ربط Google Sheets</div>
+      </div>
+
+      <div class="sheets-section">
+        <div class="sheets-title">تصدير النتائج إلى Google Sheets</div>
+        <div class="sheets-sub">صدّري نتائج التصويت الحالية مباشرة كملف CSV يمكن فتحه في Google Sheets، أو اربطي منصتك بـ Google Apps Script لتحديث تلقائي.</div>
+
+        <div class="gs-steps">
+          <div class="gs-step"><div class="gs-step-text">اضغطي <strong>"تصدير CSV"</strong> لتنزيل ملف بجميع النتائج الحالية</div></div>
+          <div class="gs-step"><div class="gs-step-text">افتحي <strong>Google Sheets</strong> وأنشئي جدولًا جديدًا</div></div>
+          <div class="gs-step"><div class="gs-step-text">من القائمة: <code>File → Import → Upload</code> ثم ارفعي ملف CSV</div></div>
+          <div class="gs-step"><div class="gs-step-text">للتحديث التلقائي: انسخي رابط Google Sheets وألصقيه أدناه</div></div>
+        </div>
+
+        <button class="sheets-export-btn" onclick="exportToSheets()">
+          <span>📊</span> تصدير النتائج الآن (CSV)
+        </button>
+
+        <div class="sheets-url-section">
+          <div class="sheets-url-label">رابط Google Sheets (اختياري — للتحديث التلقائي)</div>
+          <div class="sheets-url-input-wrap">
+            <input type="url" class="sheets-url-input" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/..." value="">
+            <button class="sheets-connect-btn" onclick="connectSheets()">ربط</button>
+          </div>
+          <div class="connected-badge" id="connected-badge">
+            <span>✓</span> متصل بـ Google Sheets
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7">
+            ملاحظة: الربط المباشر يتطلب Google Apps Script. للمساعدة، تواصلي مع فريق التطوير.
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA PREVIEW -->
+      <div class="results-section">
+        <div class="rs-header">
+          <div class="rs-title">معاينة البيانات المُصدَّرة</div>
+        </div>
+        <div id="sheets-preview" style="padding:16px;font-family:var(--fm);font-size:11px;color:var(--muted);line-height:1.8;overflow-x:auto;white-space:pre"></div>
+      </div>
+    </div>
+
+  </div><!-- admin-main -->
+</div><!-- admin-shell -->
+
+<!-- EDIT/ADD DRAWER -->
+<div class="drawer-overlay" id="drawer-overlay">
+  <div class="drawer" id="drawer">
+    <div class="drawer-top">
+      <div class="drawer-title" id="drawer-title">إضافة مشروع جديد</div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <input type="hidden" id="edit-id">
+      <div class="form-row"><label>عنوان المبادرة <span class="req">*</span></label><input id="f-title" placeholder="مثال: نافذة للتنفس"></div>
+      <div class="two-col">
+        <div class="form-row"><label>اسم الطالبة/الطالب <span class="req">*</span></label><input id="f-name" placeholder="الاسم الكامل"></div>
+        <div class="form-row"><label>السنة الدراسية</label><input id="f-year" placeholder="السنة الأولى" value="السنة الأولى"></div>
+      </div>
+      <div class="two-col">
+        <div class="form-row"><label>المجال</label>
+          <select id="f-cat">
+            <option value="health">الصحة المجتمعية</option>
+            <option value="education">التربية والتعليم</option>
+            <option value="tech">التكنولوجيا والمجتمع</option>
+            <option value="community">خدمة المجتمع</option>
+          </select>
+        </div>
+        <div class="form-row"><label>الفئة المستهدفة</label><input id="f-target" placeholder="طلاب / أطفال / مجتمع..."></div>
+      </div>
+      <div class="form-row"><label>المشكلة <span class="req">*</span></label><textarea id="f-problem" placeholder="ما التحدي المجتمعي الذي تعالجه هذه المبادرة؟"></textarea></div>
+      <div class="form-row"><label>الفكرة / المبادرة <span class="req">*</span></label><textarea id="f-idea" placeholder="كيف تحل المبادرة هذه المشكلة؟"></textarea></div>
+      <div class="form-row"><label>الأثر المتوقع</label><input id="f-impact" placeholder="مثال: ٣٠٠ طفل سيستفيدون في ٤ مدارس"></div>
+      <div class="form-row"><label>رابط الفيديو</label>
+        <input id="f-video" type="url" placeholder="https://youtube.com/watch?v=..." oninput="previewVideo(this.value)">
+        <div class="video-preview" id="video-preview">✓ رابط صالح — سيظهر في المنصة</div>
+        <div class="hint">YouTube · Google Drive · أي رابط فيديو مباشر</div>
+      </div>
+      <div class="form-row"><label>ملخص AI (اختياري)</label><textarea id="f-ai" placeholder="ملخص أكاديمي ذكي للمبادرة..."></textarea></div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-save" onclick="saveProject()">حفظ المشروع</button>
+      <button class="btn-cancel" onclick="closeDrawer()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ PASSWORDS ══ */
+const PASSWORDS = ['qasemi2025','doaa2025','tedai'];
+
+/* ══ DATA — synced with index.html via localStorage ══ */
+function getProjects() {
+  try {
+    const s = localStorage.getItem('ted-ai-projects');
+    if (s) return JSON.parse(s);
+  } catch(e){}
+  return getDefaultProjects();
+}
+
+function saveProjects(projects) {
+  localStorage.setItem('ted-ai-projects', JSON.stringify(projects));
+  updateDashStats(projects);
+}
+
+function getDefaultProjects() {
+  return [
+    {id:1,title:'نافذة للتنفس',name:'شروق أبو فرح',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'ش',bg:'linear-gradient(135deg,#180a18,#0d0d18)',problem:'ضغط نفسي حاد لدى الطلاب دون مساحة تعبير آمنة',idea:'غرفة آمنة للتعبير عن المشاعر بعيدًا عن الحكم',target:'طلاب',impact:'تحسين الصحة النفسية',impactN:120,aiSummary:'مبادرة تعالج أزمة الصحة النفسية الصامتة — توفير فضاء آمن يتوافق مع نموذج Peer Support.',videoUrl:'',url:'',votes:8,stars:4.2,views:45,catVotes:{impact:5,creative:3,applicable:4},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['top-impact']},
+    {id:2,title:'ركن الاستماع',name:'ريئام ناطور',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'ر',bg:'linear-gradient(135deg,#0a1818,#0d0d18)',problem:'غياب مساحة آمنة للتعبير',idea:'جلسات استماع سرية ودورية',target:'طلاب',impact:'تقليل التوتر',impactN:160,aiSummary:'جلسات الاستماع السرية نهج مثبت في خفض التوتر.',videoUrl:'',url:'',votes:6,stars:3.9,views:38,catVotes:{impact:4,creative:2,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['audience-choice']},
+    {id:3,title:'فضفضة بدون خوف',name:'سدين قضماني',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'س',bg:'linear-gradient(135deg,#18180a,#0d0d18)',problem:'عدم القدرة على التعبير عن المشاعر',idea:'صندوق أسرار رقمي وجلسات تعبير آمنة',target:'طلاب',impact:'دعم نفسي وتحرير داخلي',impactN:200,aiSummary:'الصندوق السري كأداة تربوية ذكية.',videoUrl:'',url:'',votes:5,stars:4.1,views:32,catVotes:{impact:3,creative:2,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:4,title:'مساحة آمنة',name:'شهد أغباريه',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'ش',bg:'linear-gradient(135deg,#0a1808,#0d0d18)',problem:'نقص الدعم النفسي الجامعي',idea:'لقاءات أسبوعية للاستماع والمشاركة',target:'طلاب',impact:'راحة نفسية واستقرار عاطفي',impactN:240,aiSummary:'اللقاءات الأسبوعية تبني رأس مال اجتماعي حقيقي.',videoUrl:'',url:'',votes:7,stars:4.0,views:41,catVotes:{impact:4,creative:3,applicable:4},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['most-applicable']},
+    {id:5,title:'جلسة دعم Zoom',name:'دانا',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'د',bg:'linear-gradient(135deg,#18100a,#0d0d0d)',problem:'ضعف التفاعل الطلابي',idea:'جلسات دعم أسبوعية عبر Zoom',target:'طلاب',impact:'زيادة التفاعل وتقليل الوحدة',impactN:280,aiSummary:'توظيف التكنولوجيا لكسر حواجز الدعم النفسي.',videoUrl:'',url:'',votes:4,stars:3.7,views:28,catVotes:{impact:2,creative:2,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:6,title:'مساحة آمنة رقمية',name:'مجموعة طلابية',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'م',bg:'linear-gradient(135deg,#0a0a18,#0d0d0d)',problem:'صعوبة الوصول للدعم النفسي',idea:'منصة دعم رقمية مجهولة الهوية',target:'شباب',impact:'استمرارية الدعم النفسي',impactN:320,aiSummary:'الدعم الرقمي المجهول يُزيل وصمة طلب المساعدة.',videoUrl:'',url:'',votes:3,stars:3.8,views:25,catVotes:{impact:2,creative:1,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:7,title:'أنا هون',name:'دارين طه',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'د',bg:'linear-gradient(135deg,#180a0a,#0d0d18)',problem:'شعور بالوحدة والانفصال',idea:'لقاءات دعم دورية ونشاطات انتماء',target:'طلاب',impact:'تعزيز الانتماء والتواصل',impactN:360,aiSummary:'مبادرة تعالج وباء الوحدة الجامعية.',videoUrl:'',url:'',votes:9,stars:4.3,views:52,catVotes:{impact:6,creative:3,applicable:5},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['ai-pick']},
+    {id:8,title:'مبرمج المستقبل',name:'آية جزماوي',year:'السنة الأولى',topic:'التكنولوجيا والمجتمع',cat:'tech',init:'آ',bg:'linear-gradient(135deg,#0a1818,#0d0d0d)',problem:'صعوبة تعلم البرمجة',idea:'ورش تعلم تفاعلية بأسلوب اللعب',target:'طلاب',impact:'فهم أعمق للتكنولوجيا',impactN:400,aiSummary:'تعليم البرمجة بالألعاب يرفع الدافعية.',videoUrl:'',url:'',votes:5,stars:4.0,views:35,catVotes:{impact:3,creative:4,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['most-creative']},
+    {id:9,title:'نادي القراءة',name:'عروب',year:'السنة الأولى',topic:'التربية والتعليم',cat:'education',init:'ع',bg:'linear-gradient(135deg,#18180a,#0d0d0d)',problem:'ضعف مهارات القراءة',idea:'أنشطة قراءة تفاعلية',target:'أطفال',impact:'تنمية التفكير النقدي',impactN:440,aiSummary:'نادي القراءة يُنمي التفكير النقدي من الصغر.',videoUrl:'',url:'',votes:4,stars:3.8,views:30,catVotes:{impact:2,creative:2,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:10,title:'ورشة التنمر',name:'عروب',year:'السنة الأولى',topic:'التربية والتعليم',cat:'education',init:'ع',bg:'linear-gradient(135deg,#0a1808,#0d0d18)',problem:'انتشار التنمر في المدارس',idea:'ورشة توعوية وتدريبية',target:'أطفال',impact:'تقليل التنمر وتعزيز التعاطف',impactN:480,aiSummary:'ورش مكافحة التنمر تجمع الوعي مع مهارات التدخل.',videoUrl:'',url:'',votes:6,stars:4.1,views:37,catVotes:{impact:4,creative:2,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:11,title:'التمكين الرقمي',name:'مصطفى مصلح',year:'السنة الأولى',topic:'التكنولوجيا والمجتمع',cat:'tech',init:'م',bg:'linear-gradient(135deg,#18100a,#0d0d18)',problem:'ضعف الأمان الرقمي',idea:'تدريب تقني عملي',target:'نساء وكبار السن',impact:'تمكين رقمي وحماية',impactN:520,aiSummary:'التمكين الرقمي يُكسر حواجز الاستبعاد الرقمي.',videoUrl:'',url:'',votes:5,stars:3.9,views:33,catVotes:{impact:3,creative:2,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['most-applicable']},
+    {id:12,title:'بسمة أمل',name:'نبأ ناطور',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'ن',bg:'linear-gradient(135deg,#0a0a18,#0d0d18)',problem:'وحدة الأطفال المرضى',idea:'زيارات دعم وأنشطة ترفيهية',target:'أطفال المستشفيات',impact:'رفع المعنويات وتسريع الشفاء',impactN:560,aiSummary:'الدعم الإنساني في المستشفيات محوّل فعلي للشفاء.',videoUrl:'',url:'',votes:7,stars:4.5,views:48,catVotes:{impact:5,creative:2,applicable:4},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:13,title:'نحن معكم',name:'ميس ناصر',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'م',bg:'linear-gradient(135deg,#180a18,#0d0d0d)',problem:'نقص دعم نزلاء دور الرعاية',idea:'زيارات علاجية ولقاءات أسبوعية',target:'نزلاء دور الرعاية',impact:'دعم نفسي وتقليل العزلة',impactN:600,aiSummary:'الزيارات المنتظمة تبني روابط تعوّض الانفصال.',videoUrl:'',url:'',votes:6,stars:4.2,views:42,catVotes:{impact:4,creative:2,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['top-impact']},
+    {id:14,title:'إطعام الحيوانات',name:'سما كبها',year:'السنة الأولى',topic:'خدمة المجتمع',cat:'community',init:'س',bg:'linear-gradient(135deg,#0a1820,#0d0d18)',problem:'إهمال الحيوانات الضالة',idea:'حملة منظمة للرعاية',target:'المجتمع',impact:'رعاية الحيوانات',impactN:640,aiSummary:'رعاية الحيوانات تُنمّي المسؤولية والتعاطف.',videoUrl:'',url:'',votes:3,stars:3.6,views:22,catVotes:{impact:2,creative:1,applicable:1},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:15,title:'مستقبلي بيدي',name:'مجموعة طلابية',year:'السنة الأولى',topic:'التربية والتعليم',cat:'education',init:'م',bg:'linear-gradient(135deg,#18180a,#0d0d18)',problem:'ضعف الثقة بالنفس',idea:'نشاط تعبير إبداعي',target:'أطفال',impact:'تعزيز الثقة والطموح',impactN:680,aiSummary:'بناء الثقة عبر التعبير الإبداعي تدخل مبكر بأثر طويل.',videoUrl:'',url:'',votes:4,stars:3.9,views:29,catVotes:{impact:3,creative:2,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:16,title:'ساعة ألعاب',name:'سارة',year:'السنة الأولى',topic:'الصحة المجتمعية',cat:'health',init:'س',bg:'linear-gradient(135deg,#18100a,#0d0d0d)',problem:'التوتر وضغط الدراسة',idea:'ألعاب تفاعلية هادفة',target:'طلاب',impact:'تخفيف التوتر',impactN:720,aiSummary:'الترفيه الهادف استراتيجية إدارة ضغط مُثبتة.',videoUrl:'',url:'',votes:5,stars:3.8,views:31,catVotes:{impact:3,creative:2,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:['most-creative']},
+    {id:17,title:'على نياتكم ترزقون',name:'سجود عسلي',year:'السنة الأولى',topic:'التربية والتعليم',cat:'education',init:'س',bg:'linear-gradient(135deg,#0a1808,#0d0d0d)',problem:'ضعف الدافعية',idea:'جلسات كتابة النوايا والأحلام',target:'طلاب',impact:'تحفيز داخلي',impactN:760,aiSummary:'كتابة النوايا تُفعّل الهدف الداخلي.',videoUrl:'',url:'',votes:6,stars:4.0,views:36,catVotes:{impact:4,creative:3,applicable:3},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+    {id:18,title:'توزيع هدايا',name:'آلاء ونائلة',year:'السنة الأولى',topic:'خدمة المجتمع',cat:'community',init:'آ',bg:'linear-gradient(135deg,#180a0a,#0d0d0d)',problem:'ضعف الروابط الاجتماعية',idea:'توزيع هدايا رمزية',target:'المجتمع',impact:'نشر الإيجابية',impactN:800,aiSummary:'الهدايا الرمزية تُحدث تأثير الفراشة الإيجابي.',videoUrl:'',url:'',votes:4,stars:3.7,views:27,catVotes:{impact:2,creative:2,applicable:2},voted:false,starred:0,catVoted:null,judgeScore:null,badges:[]},
+  ];
+}
+
+/* ══ AUTH ══ */
+function doLogin(e) {
+  e.preventDefault();
+  const pw = document.getElementById('pw').value;
+  const btn = document.getElementById('l-btn');
+  const err = document.getElementById('l-err');
+  btn.disabled = true; btn.textContent = 'جارٍ التحقق...';
+  setTimeout(() => {
+    if (PASSWORDS.includes(pw)) {
+      sessionStorage.setItem('ted-admin','1');
+      showAdmin();
+    } else {
+      err.style.display = 'block';
+      btn.disabled = false; btn.textContent = 'دخول ←';
+      document.getElementById('pw').value = '';
+    }
+  }, 500);
+}
+function doLogout() {
+  sessionStorage.removeItem('ted-admin');
+  document.getElementById('admin-shell').classList.remove('show');
+  document.getElementById('login-page').style.display = 'flex';
+}
+function showAdmin() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-shell').classList.add('show');
+  initAdmin();
+}
+if (sessionStorage.getItem('ted-admin') === '1') showAdmin();
+
+/* ══ TABS ══ */
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ab-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('tab-' + id).classList.add('on');
+  event.target.classList.add('on');
+  if (id === 'results') renderResults();
+  if (id === 'videos') renderVideosTable();
+  if (id === 'sheets') renderSheetsPreview();
+  if (id === 'projects') renderProjectsTable();
+}
+
+/* ══ TOAST ══ */
+function toast(msg, type='') {
+  const e = document.getElementById('toast');
+  e.textContent = msg; e.className = 'toast show ' + type;
+  setTimeout(() => e.classList.remove('show'), 3200);
+}
+
+/* ══ HELPERS ══ */
+const fin = p => Math.round(p.votes * 0.5 + p.stars * 8 + p.views * 0.02);
+
+/* ══ INIT ══ */
+function initAdmin() {
+  const projects = getProjects();
+  updateDashStats(projects);
+  renderQuickResults(projects);
+  renderProjectsTable();
+  renderVideosTable();
+}
+
+function updateDashStats(projects) {
+  document.getElementById('dc-projects').textContent = projects.length;
+  document.getElementById('dc-votes').textContent = projects.reduce((a,p)=>a+p.votes,0);
+  document.getElementById('dc-views').textContent = projects.reduce((a,p)=>a+p.views,0);
+  document.getElementById('dc-videos').textContent = projects.filter(p=>p.videoUrl||p.url).length;
+}
+
+/* ══ QUICK RESULTS ══ */
+function renderQuickResults(projects) {
+  if (!projects) projects = getProjects();
+  const sorted = [...projects].sort((a,b) => fin(b) - fin(a));
+  const max = fin(sorted[0]) || 1;
+  document.getElementById('quick-results').innerHTML = sorted.slice(0,5).map((p,i) => `
+  <div class="result-row">
+    <div class="rr-rank ${i<3?'top':''}">${['🥇','🥈','🥉','4','5'][i]}</div>
+    <div><div class="rr-title">${p.title}</div><div class="rr-name">${p.name}</div></div>
+    <div class="rr-col">${p.votes}</div>
+    <div class="rr-col">${p.stars.toFixed(1)}</div>
+    <div class="rr-col">${p.views}</div>
+    <div class="rr-total">${fin(p)}</div>
+  </div>`).join('');
+}
+
+/* ══ PROJECTS TABLE ══ */
+function renderProjectsTable(filter='') {
+  const projects = getProjects();
+  const list = filter ? projects.filter(p =>
+    p.title.includes(filter) || p.name.includes(filter) || p.topic.includes(filter)
+  ) : projects;
+  document.getElementById('projects-table-body').innerHTML = list.map(p => `
+  <div class="pt-row">
+    <div class="pt-id">${p.id}</div>
+    <div class="pt-info">
+      <div class="pt-title">${p.title}</div>
+      <div class="pt-student">${p.name}</div>
+      <div class="pt-topic">${p.topic}</div>
+    </div>
+    <div class="pt-col" style="font-size:11px;text-align:right;color:var(--muted)">${p.topic}</div>
+    <div class="pt-col">${p.votes}</div>
+    <div class="pt-col">${p.views}</div>
+    <div class="pt-col">
+      <div class="video-indicator ${(p.videoUrl||p.url)?'has':''}"></div>
+    </div>
+    <div class="pt-col">${p.stars.toFixed(1)}</div>
+    <div class="pt-actions">
+      <button class="action-btn btn-edit" onclick="openEditProject(${p.id})">✏ تعديل</button>
+      <button class="action-btn btn-link" onclick="openVideoLink(${p.id})">🎬 فيديو</button>
+      <button class="action-btn btn-del" onclick="deleteProject(${p.id})">✕</button>
+    </div>
+  </div>`).join('');
+}
+
+function searchProjects(q) { renderProjectsTable(q); }
+
+/* ══ DRAWER ══ */
+function openAddProject() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('drawer-title').textContent = 'إضافة مشروع جديد';
+  ['f-title','f-name','f-year','f-target','f-problem','f-idea','f-impact','f-video','f-ai'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('f-year').value = 'السنة الأولى';
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+function openEditProject(id) {
+  const p = getProjects().find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('drawer-title').textContent = 'تعديل: ' + p.title;
+  document.getElementById('f-title').value = p.title;
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-year').value = p.year;
+  document.getElementById('f-cat').value = p.cat;
+  document.getElementById('f-target').value = p.target;
+  document.getElementById('f-problem').value = p.problem;
+  document.getElementById('f-idea').value = p.idea;
+  document.getElementById('f-impact').value = p.impact;
+  document.getElementById('f-video').value = p.videoUrl || '';
+  document.getElementById('f-ai').value = p.aiSummary || '';
+  previewVideo(p.videoUrl || '');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+function openVideoLink(id) {
+  openEditProject(id);
+  setTimeout(() => document.getElementById('f-video').focus(), 300);
+}
+function closeDrawer() { document.getElementById('drawer-overlay').classList.remove('open'); }
+document.getElementById('drawer-overlay').addEventListener('click', e => { if(e.target.id==='drawer-overlay') closeDrawer(); });
+
+function previewVideo(url) {
+  const el = document.getElementById('video-preview');
+  const valid = url && (url.includes('youtube') || url.includes('youtu.be') || url.includes('drive.google') || url.startsWith('http'));
+  el.className = 'video-preview' + (valid ? ' show' : '');
+}
+
+function saveProject() {
+  const id = document.getElementById('edit-id').value;
+  const title = document.getElementById('f-title').value.trim();
+  const name = document.getElementById('f-name').value.trim();
+  if (!title || !name) { toast('يرجى ملء الحقول الإلزامية','err'); return; }
+  const cat = document.getElementById('f-cat').value;
+  const catTopics = {health:'الصحة المجتمعية',education:'التربية والتعليم',tech:'التكنولوجيا والمجتمع',community:'خدمة المجتمع'};
+  const projects = getProjects();
+  if (id) {
+    const idx = projects.findIndex(p => p.id == id);
+    if (idx !== -1) {
+      projects[idx] = {
+        ...projects[idx],
+        title, name,
+        year: document.getElementById('f-year').value || 'السنة الأولى',
+        cat, topic: catTopics[cat],
+        target: document.getElementById('f-target').value,
+        problem: document.getElementById('f-problem').value,
+        idea: document.getElementById('f-idea').value,
+        impact: document.getElementById('f-impact').value,
+        videoUrl: document.getElementById('f-video').value,
+        url: document.getElementById('f-video').value,
+        aiSummary: document.getElementById('f-ai').value,
+        init: name[0] || '؟',
+      };
+      toast('✓ تم تحديث المشروع','ok');
+    }
+  } else {
+    const newId = Math.max(...projects.map(p=>p.id),0) + 1;
+    projects.push({
+      id:newId, title, name,
+      year: document.getElementById('f-year').value || 'السنة الأولى',
+      cat, topic: catTopics[cat],
+      target: document.getElementById('f-target').value,
+      problem: document.getElementById('f-problem').value,
+      idea: document.getElementById('f-idea').value,
+      impact: document.getElementById('f-impact').value,
+      impactN: 100,
+      aiSummary: document.getElementById('f-ai').value || 'مبادرة طلابية مؤثرة في مجال '+catTopics[cat]+'.',
+      videoUrl: document.getElementById('f-video').value,
+        url: document.getElementById('f-video').value,
+      init: name[0] || '؟',
+      bg: 'linear-gradient(135deg,#180a0a,#0d0d18)',
+      votes:0, stars:0, views:0,
+      catVotes:{impact:0,creative:0,applicable:0},
+      voted:false, starred:0, catVoted:null, judgeScore:null, badges:[],
+    });
+    toast('✓ تم إضافة المشروع الجديد','ok');
+  }
+  saveProjects(projects);
+  renderProjectsTable();
+  renderVideosTable();
+  closeDrawer();
+}
+
+function deleteProject(id) {
+  const p = getProjects().find(x => x.id === id);
+  if (!confirm(`هل تريدين حذف "${p?.title}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) return;
+  const projects = getProjects().filter(p => p.id !== id);
+  saveProjects(projects);
+  renderProjectsTable();
+  renderQuickResults(projects);
+  toast('✓ تم حذف المشروع','ok');
+}
+
+/* ══ VIDEOS TABLE ══ */
+function renderVideosTable() {
+  const projects = getProjects();
+  document.getElementById('videos-table').innerHTML = projects.map(p => `
+  <div class="vs-row">
+    <div>
+      <div class="vs-title">${p.title}</div>
+      <div style="font-size:11px;color:var(--muted)">${p.topic}</div>
+    </div>
+    <div style="font-size:13px;color:var(--off)">${p.name}</div>
+    <div style="text-align:center">
+      <div class="video-indicator ${(p.videoUrl||p.url)?'has':''}" style="margin:0 auto" title="${p.videoUrl?'يوجد رابط':'لا يوجد رابط'}"></div>
+    </div>
+    <div style="text-align:center">
+      ${p.videoUrl ? `<button class="icon-btn" onclick="window.open('${p.videoUrl||p.url}','_blank')" title="معاينة">▶</button>` : '<span style="font-size:11px;color:var(--muted2)">—</span>'}
+    </div>
+    <div>
+      <input
+        class="vs-url-input ${p.videoUrl?'has-url':''}"
+        type="url"
+        placeholder="أضيفي رابط YouTube..."
+        value="${p.videoUrl||''}"
+        onchange="saveVideoUrl(${p.id},this)"
+        oninput="this.className='vs-url-input'+(this.value?'has-url':'')"
+      >
+    </div>
+  </div>`).join('');
+}
+
+function saveVideoUrl(id, input) {
+  const url = input.value.trim();
+  const projects = getProjects();
+  const idx = projects.findIndex(p => p.id === id);
+  if (idx !== -1) {
+    projects[idx].videoUrl = url; projects[idx].url = url;
+    saveProjects(projects);
+    input.className = 'vs-url-input ' + (url ? 'has-url' : '');
+    toast('✓ تم حفظ رابط الفيديو','ok');
+    updateDashStats(projects);
+  }
+}
+
+/* ══ RESULTS ══ */
+function renderResults() {
+  const projects = getProjects();
+  const sorted = [...projects].sort((a,b) => fin(b) - fin(a));
+  const max = fin(sorted[0]) || 1;
+
+  // Full table
+  document.getElementById('full-results').innerHTML = sorted.map((p,i) => `
+  <div class="result-row ${i<3?'top':''}">
+    <div class="rr-rank ${i<3?'top':''}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+    <div><div class="rr-title">${p.title}</div><div class="rr-name">${p.name}</div></div>
+    <div class="rr-col">${p.votes}</div>
+    <div class="rr-col">${p.stars.toFixed(1)}</div>
+    <div class="rr-col">${p.views}</div>
+    <div style="padding:0 8px">
+      <div class="rr-bar-bg"><div class="rr-bar-fill" style="width:${fin(p)/max*100}%"></div></div>
+      <div class="rr-total" style="margin-top:4px">${fin(p)}</div>
+    </div>
+  </div>`).join('');
+
+  // Category results
+  ['impact','creative','applicable'].forEach(cat => {
+    const catSorted = [...projects].sort((a,b) => b.catVotes[cat] - a.catVotes[cat]);
+    document.getElementById('cat-'+cat).innerHTML = catSorted.slice(0,5).map((p,i) => `
+    <div style="padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;${i===0?'background:rgba(200,134,26,.04)':''}">
+      <div style="font-size:16px;font-weight:700;color:${i===0?'var(--gold2)':'var(--muted2)'};min-width:20px;text-align:center">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--cream)">${p.title}</div>
+        <div style="font-size:10px;color:var(--muted)">${p.name}</div>
+      </div>
+      <div style="font-family:var(--fm);font-size:14px;font-weight:700;color:var(--gold2)">${p.catVotes[cat]}</div>
+    </div>`).join('');
+  });
+}
+
+/* ══ EXPORT ══ */
+function exportResults() {
+  const projects = getProjects();
+  const sorted = [...projects].sort((a,b) => fin(b)-fin(a));
+  const header = 'الترتيب,عنوان المبادرة,اسم الطالبة,الموضوع,التصويت,النجوم,المشاهدات,الأكثر تأثيرًا,الأكثر إبداعًا,الأكثر تطبيقًا,الإجمالي,رابط الفيديو\n';
+  const rows = sorted.map((p,i) =>
+    `${i+1},"${p.title}","${p.name}","${p.topic}",${p.votes},${p.stars.toFixed(1)},${p.views},${p.catVotes.impact},${p.catVotes.creative},${p.catVotes.applicable},${fin(p)},"${p.videoUrl||''}"`
+  ).join('\n');
+  const csv = '\uFEFF' + header + rows;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download = 'ted-ai-results-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  toast('✓ تم تصدير النتائج كـ CSV','ok');
+}
+
+function exportToSheets() {
+  exportResults();
+  toast('✓ تم التصدير — افتحي Google Sheets وارفعي الملف','ok');
+}
+
+function connectSheets() {
+  const url = document.getElementById('sheets-url').value.trim();
+  if (!url || !url.includes('docs.google.com')) { toast('⚠ أدخلي رابط Google Sheets صحيح','err'); return; }
+  localStorage.setItem('ted-sheets-url', url);
+  document.getElementById('connected-badge').classList.add('show');
+  toast('✓ تم حفظ رابط Google Sheets','ok');
+}
+
+function renderSheetsPreview() {
+  const projects = getProjects();
+  const sorted = [...projects].sort((a,b)=>fin(b)-fin(a));
+  const header = 'الترتيب | المبادرة | الطالبة | تصويت | نجوم | مشاهدات | الإجمالي';
+  const sep = '-'.repeat(80);
+  const rows = sorted.slice(0,8).map((p,i) =>
+    `${String(i+1).padEnd(8)}| ${p.title.padEnd(22)}| ${p.name.padEnd(16)}| ${String(p.votes).padEnd(7)}| ${p.stars.toFixed(1).padEnd(6)}| ${String(p.views).padEnd(9)}| ${fin(p)}`
+  ).join('\n');
+  document.getElementById('sheets-preview').textContent = header + '\n' + sep + '\n' + rows + '\n' + sep + '\n... وأكثر في ملف CSV الكامل';
+
+  const savedUrl = localStorage.getItem('ted-sheets-url');
+  if (savedUrl) {
+    document.getElementById('sheets-url').value = savedUrl;
+    document.getElementById('connected-badge').classList.add('show');
+  }
+}
+
+/* ══ AUTO-REFRESH results every 10s ══ */
+setInterval(() => {
+  if (document.getElementById('tab-results').classList.contains('on')) renderResults();
+  if (document.getElementById('tab-dashboard').classList.contains('on')) {
+    renderQuickResults();
+    updateDashStats(getProjects());
+  }
+}, 10000);
+</script>
+</body>
+</html>
